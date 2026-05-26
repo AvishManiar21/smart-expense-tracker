@@ -9,12 +9,12 @@ export default function BudgetCard({ budget, onEdit, onDelete, isDeleting }) {
     spentAmount = 0,
     percentageUsed = 0,
     period,
-    startDate,
-    endDate,
+    periodStart,
+    periodEnd,
   } = budget;
 
   const remainingAmount = parseFloat(budgetAmount) - parseFloat(spentAmount);
-  const daysLeft = differenceInDays(new Date(endDate), new Date());
+  const daysLeft = periodEnd ? differenceInDays(new Date(periodEnd), new Date()) : 0;
 
   const getStatusBadge = () => {
     if (percentageUsed >= 100) {
@@ -83,11 +83,13 @@ export default function BudgetCard({ budget, onEdit, onDelete, isDeleting }) {
       </div>
 
       {/* Period Info */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <p className="text-xs text-gray-500">
-          {format(new Date(startDate), 'MMM dd, yyyy')} - {format(new Date(endDate), 'MMM dd, yyyy')}
-        </p>
-      </div>
+      {periodStart && periodEnd && (
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <p className="text-xs text-gray-500">
+            {format(new Date(periodStart), 'MMM dd, yyyy')} - {format(new Date(periodEnd), 'MMM dd, yyyy')}
+          </p>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="mt-4 flex justify-end space-x-3">
@@ -120,8 +122,8 @@ BudgetCard.propTypes = {
     spentAmount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     percentageUsed: PropTypes.number,
     period: PropTypes.string.isRequired,
-    startDate: PropTypes.string.isRequired,
-    endDate: PropTypes.string.isRequired,
+    periodStart: PropTypes.string,
+    periodEnd: PropTypes.string,
   }).isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,

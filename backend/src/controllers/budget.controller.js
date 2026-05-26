@@ -187,12 +187,12 @@ export const getBudgetAlerts = asyncHandler(async (req, res) => {
     })
   );
 
-  // Filter only alerts (>= 80%)
-  const alerts = budgetsWithStatus.filter((b) => b.percentageUsed >= 80);
+  // Filter only alerts (>= 70%) to match UI warning threshold
+  const alerts = budgetsWithStatus.filter((b) => b.percentageUsed >= 70);
 
   // Group by severity
   const exceeded = alerts.filter((b) => b.percentageUsed >= 100);
-  const warning = alerts.filter((b) => b.percentageUsed >= 80 && b.percentageUsed < 100);
+  const warning = alerts.filter((b) => b.percentageUsed >= 70 && b.percentageUsed < 100);
 
   res.json({
     success: true,

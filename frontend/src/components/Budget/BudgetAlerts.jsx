@@ -26,7 +26,7 @@ export default function BudgetAlerts({ alerts }) {
               </h3>
               <div className="space-y-2">
                 {exceededAlerts.map((alert) => (
-                  <div key={alert.budgetId} className="text-sm text-red-700">
+                  <div key={alert.id} className="text-sm text-red-700">
                     <span className="font-medium">{alert.category?.name || 'Unknown'}:</span>{' '}
                     ${parseFloat(alert.spentAmount).toFixed(2)} spent of ${parseFloat(alert.budgetAmount).toFixed(2)} budget
                     ({alert.percentageUsed.toFixed(1)}%)
@@ -49,7 +49,7 @@ export default function BudgetAlerts({ alerts }) {
               </h3>
               <div className="space-y-2">
                 {warningAlerts.map((alert) => (
-                  <div key={alert.budgetId} className="text-sm text-yellow-700">
+                  <div key={alert.id} className="text-sm text-yellow-700">
                     <span className="font-medium">{alert.category?.name || 'Unknown'}:</span>{' '}
                     ${parseFloat(alert.spentAmount).toFixed(2)} spent of ${parseFloat(alert.budgetAmount).toFixed(2)} budget
                     ({alert.percentageUsed.toFixed(1)}%)
@@ -67,7 +67,7 @@ export default function BudgetAlerts({ alerts }) {
 BudgetAlerts.propTypes = {
   alerts: PropTypes.arrayOf(
     PropTypes.shape({
-      budgetId: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
       category: PropTypes.shape({
         name: PropTypes.string,
       }),

@@ -231,30 +231,45 @@ export const processRecurring = asyncHandler(async (req, res) => {
   });
 
   let processedCount = 0;
+  const MAX_CATCH_UP_ITERATIONS = 100; // Safety limit to prevent infinite loops
 
   for (const recurring of dueRecurring) {
-    // Create expense from recurring template
-    await prisma.expense.create({
-      data: {
-        userId,
-        amount: recurring.amount,
-        categoryId: recurring.categoryId,
-        description: recurring.description,
-        date: recurring.nextOccurrence,
-        paymentMethod: 'card', // Default for recurring
-        isRecurring: true,
-        recurringId: recurring.id,
-      },
-    });
+    let currentOccurrence = new Date(recurring.nextOccurrence);
+    let iterations = 0;
 
-    // Update next occurrence
-    const nextOccurrence = calculateNextOccurrence(recurring.nextOccurrence, recurring.frequency);
+    // Loop to catch up on all missed occurrences
+    while (currentOccurrence <= today && iterations < MAX_CATCH_UP_ITERATIONS) {
+      // Create expense from recurring template
+      await prisma.expense.create({
+        data: {
+          userId,
+          amount: recurring.amount,
+          categoryId: recurring.categoryId,
+          description: recurring.description,
+          date: currentOccurrence,
+          paymentMethod: 'card', // Default for recurring
+          isRecurring: true,
+          recurringId: recurring.id,
+        },
+      });
+
+      processedCount++;
+      iterations++;
+
+      // Calculate next occurrence
+      currentOccurrence = calculateNextOccurrence(currentOccurrence, recurring.frequency);
+    }
+
+    // Update the recurring template with the new next occurrence
     await prisma.recurringExpense.update({
       where: { id: recurring.id },
-      data: { nextOccurrence },
+      data: { nextOccurrence: currentOccurrence },
     });
 
-    processedCount++;
+    // Warn if we hit the safety limit
+    if (iterations >= MAX_CATCH_UP_ITERATIONS) {
+      console.warn(`Recurring expense ${recurring.id} hit max catch-up limit of ${MAX_CATCH_UP_ITERATIONS} iterations`);
+    }
   }
 
   res.json({
