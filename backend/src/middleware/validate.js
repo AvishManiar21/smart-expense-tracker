@@ -1,5 +1,6 @@
 import { body, validationResult } from 'express-validator';
 import { ValidationError } from '../utils/errors.js';
+import { validatePasswordStrength } from '../utils/password.js';
 
 /**
  * Handle validation errors
@@ -27,8 +28,13 @@ export const validateRegister = [
     .normalizeEmail(),
 
   body('password')
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long'),
+    .custom((value) => {
+      const passwordValidation = validatePasswordStrength(value);
+      if (!passwordValidation.valid) {
+        throw new Error(passwordValidation.message);
+      }
+      return true;
+    }),
 
   body('name')
     .trim()

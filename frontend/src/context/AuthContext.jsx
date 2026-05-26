@@ -18,14 +18,14 @@ export function AuthProvider({ children }) {
    */
   useEffect(() => {
     const loadUser = async () => {
-      if (authService.isAuthenticated()) {
-        try {
-          const response = await authService.getCurrentUser();
-          setUser(response.data.user);
-        } catch (err) {
+      try {
+        const response = await authService.getCurrentUser();
+        setUser(response.data.user);
+      } catch (err) {
+        if (err.response?.status !== 401) {
           console.error('Failed to load user:', err);
-          // Token will be cleared by api interceptor
         }
+        // Token will be cleared by api interceptor
       }
       setLoading(false);
     };
