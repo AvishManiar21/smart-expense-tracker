@@ -6,6 +6,9 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ExpensesPage from './pages/ExpensesPage';
+import IncomePage from './pages/IncomePage';
+import BudgetPage from './pages/BudgetPage';
+import RecurringPage from './pages/RecurringPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 // Create a query client
@@ -45,6 +48,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ExpensesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/income"
+              element={
+                <ProtectedRoute>
+                  <IncomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/budgets"
+              element={
+                <ProtectedRoute>
+                  <BudgetPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/recurring"
+              element={
+                <ProtectedRoute>
+                  <RecurringPage />
                 </ProtectedRoute>
               }
             />

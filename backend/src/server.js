@@ -11,6 +11,9 @@ import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import expenseRoutes from './routes/expense.routes.js';
+import incomeRoutes from './routes/income.routes.js';
+import budgetRoutes from './routes/budget.routes.js';
+import recurringRoutes from './routes/recurring.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -63,6 +66,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/income', incomeRoutes);
+app.use('/api/budgets', budgetRoutes);
+app.use('/api/recurring', recurringRoutes);
 
 // 404 handler
 app.use((req, res) => {
