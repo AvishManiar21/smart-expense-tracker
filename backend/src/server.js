@@ -4,9 +4,11 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import { PrismaClient } from '@prisma/client';
 import { config } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import authRoutes from './routes/auth.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -29,6 +31,7 @@ app.use(cors({
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Logging middleware
 if (config.nodeEnv === 'development') {
@@ -54,9 +57,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API routes will be mounted here
-// Example: app.use('/api/auth', authRoutes);
-// Example: app.use('/api/expenses', expenseRoutes);
+// API routes
+app.use('/api/auth', authRoutes);
 
 // 404 handler
 app.use((req, res) => {
