@@ -1,0 +1,123 @@
+name: PR Review Email Notification
+
+on:
+  pull_request_review:
+    types: [submitted]
+  pull_request:
+    types: [opened, closed, reopened]
+  issue_comment:
+    types: [created]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+      contents: read
+
+    steps:
+      - name: Send PR opened notification
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: false
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_APP_PASSWORD }}
+          subject: "🆕 New PR: ${{ github.event.pull_request.title }}"
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: SmartExpense GitHub <${{ secrets.EMAIL_USERNAME }}>
+          html_body: |
+            <h2>New Pull Request Opened</h2>
+            <table>
+              <tr><td><b>Title:</b></td><td>${{ github.event.pull_request.title }}</td></tr>
+              <tr><td><b>Author:</b></td><td>${{ github.event.pull_request.user.login }}</td></tr>
+              <tr><td><b>Branch:</b></td><td>${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}</td></tr>
+              <tr><td><b>Files Changed:</b></td><td>${{ github.event.pull_request.changed_files }}</td></tr>
+              <tr><td><b>Lines Added:</b></td><td>+${{ github.event.pull_request.additions }}</td></tr>
+              <tr><td><b>Lines Removed:</b></td><td>-${{ github.event.pull_request.deletions }}</td></tr>
+            </table>
+            <br>
+            <p><b>Description:</b><br>${{ github.event.pull_request.body }}</p>
+            <br>
+            <a href="${{ github.event.pull_request.html_url }}" style="background:#0066cc;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">
+              View Pull Request
+            </a>
+
+      - name: Send Copilot review notification
+        if: |
+          github.event_name == 'pull_request_review' &&
+          github.event.review.user.login == 'copilot'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: false
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_APP_PASSWORD }}
+          subject: "🤖 Copilot Review: ${{ github.event.pull_request.title }}"
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: SmartExpense GitHub <${{ secrets.EMAIL_USERNAME }}>
+          html_body: |
+            <h2>GitHub Copilot Code Review Complete</h2>
+            <table>
+              <tr><td><b>PR:</b></td><td>${{ github.event.pull_request.title }}</td></tr>
+              <tr><td><b>Review State:</b></td><td>${{ github.event.review.state }}</td></tr>
+              <tr><td><b>Author:</b></td><td>${{ github.event.pull_request.user.login }}</td></tr>
+            </table>
+            <br>
+            <h3>Copilot Review Summary:</h3>
+            <p>${{ github.event.review.body }}</p>
+            <br>
+            <a href="${{ github.event.review.html_url }}" style="background:#0066cc;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">
+              View Full Review
+            </a>
+
+      - name: Send PR merged notification
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: false
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_APP_PASSWORD }}
+          subject: "✅ PR Merged: ${{ github.event.pull_request.title }}"
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: SmartExpense GitHub <${{ secrets.EMAIL_USERNAME }}>
+          html_body: |
+            <h2>Pull Request Merged Successfully</h2>
+            <table>
+              <tr><td><b>Title:</b></td><td>${{ github.event.pull_request.title }}</td></tr>
+              <tr><td><b>Merged by:</b></td><td>${{ github.event.pull_request.merged_by.login }}</td></tr>
+              <tr><td><b>Branch:</b></td><td>${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}</td></tr>
+              <tr><td><b>Files Changed:</b></td><td>${{ github.event.pull_request.changed_files }}</td></tr>
+            </table>
+            <br>
+            <a href="${{ github.event.pull_request.html_url }}" style="background:#28a745;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">
+              View Merged PR
+            </a>
+
+      - name: Send PR closed without merge notification
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          secure: false
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_APP_PASSWORD }}
+          subject: "❌ PR Closed: ${{ github.event.pull_request.title }}"
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: SmartExpense GitHub <${{ secrets.EMAIL_USERNAME }}>
+          html_body: |
+            <h2>Pull Request Closed Without Merging</h2>
+            <table>
+              <tr><td><b>Title:</b></td><td>${{ github.event.pull_request.title }}</td></tr>
+              <tr><td><b>Author:</b></td><td>${{ github.event.pull_request.user.login }}</td></tr>
+            </table>
+            <br>
+            <a href="${{ github.event.pull_request.html_url }}" style="background:#cc0000;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">
+              View PR
+            </a>

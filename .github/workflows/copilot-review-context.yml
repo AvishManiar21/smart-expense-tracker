@@ -1,0 +1,130 @@
+name: Copilot PR Review Setup
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  setup-review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Post review checklist comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' &&
+              c.body.includes('Copilot Review Context')
+            );
+
+            if (botComment) return;
+
+            const body = `
+            ## 🤖 Copilot Review Context
+
+            **Project:** SmartExpense Tracker
+            **Stack:** React 18 + Node.js + Express + PostgreSQL + Prisma + JWT
+
+            ---
+
+            ### 🔴 Critical Checks (Block merge if failed)
+            | Check | Area |
+            |-------|------|
+            | No hardcoded secrets or API keys | Security |
+            | Authentication middleware on all protected routes | Security |
+            | Input validation on all POST/PUT endpoints | Security |
+            | Ownership check using req.user.id | Security |
+            | Passwords hashed with bcrypt | Security |
+            | No passwordHash in API responses | Security |
+
+            ### 🟡 Quality Checks (Should pass)
+            | Check | Area |
+            |-------|------|
+            | PropTypes on all React components | React |
+            | JSDoc on all functions | Documentation |
+            | No console.log in production code | Quality |
+            | No var usage (const/let only) | Quality |
+            | asyncHandler wrapping async routes | Express |
+            | Pagination on list endpoints | Performance |
+            | No N+1 database queries | Performance |
+            | Tests for new functionality | Testing |
+
+            ### 🟢 Enhancement Checks (Nice to have)
+            | Check | Area |
+            |-------|------|
+            | Caching for frequent queries | Performance |
+            | Loading + empty states in UI | UX |
+            | Error boundaries for critical components | React |
+            | Debouncing on search inputs | Performance |
+
+            ---
+
+            ### 📏 Response Format Check
+            All API responses must follow:
+            \`\`\`json
+            { "success": true, "data": {}, "message": "" }
+            { "success": false, "message": "", "errors": [] }
+            \`\`\`
+
+            ---
+            *Review powered by GitHub Copilot with SmartExpense custom instructions*
+            `;
+
+            await github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Label PR based on files changed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const labels = new Set();
+
+            for (const file of files) {
+              const path = file.filename;
+
+              if (path.startsWith('frontend/')) labels.add('frontend');
+              if (path.startsWith('backend/')) labels.add('backend');
+              if (path.includes('.test.')) labels.add('tests');
+              if (path.includes('middleware/')) labels.add('security');
+              if (path.includes('auth')) labels.add('authentication');
+              if (path.includes('prisma/')) labels.add('database');
+              if (path.startsWith('.github/')) labels.add('ci/cd');
+              if (path.includes('analytics') || path.includes('reports')) labels.add('analytics');
+            }
+
+            if (labels.size > 0) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  labels: Array.from(labels),
+                });
+              } catch (e) {
+                console.log('Labels may not exist yet:', e.message);
+              }
+            }
