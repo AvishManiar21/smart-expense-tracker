@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Download, ArrowLeft } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ExpenseList from '../components/Expenses/ExpenseList';
 import ExpenseFilters from '../components/Expenses/ExpenseFilters';
@@ -42,7 +42,7 @@ function ExpensesPage() {
   const updateExpense = useUpdateExpense();
   const deleteExpense = useDeleteExpense();
 
-  const expenses = expensesData?.data || [];
+  const expenses = expensesData?.data?.expenses || [];
   const pagination = expensesData?.pagination;
   const summary = expensesData?.summary;
   const categories = categoriesData?.data?.categories || [];

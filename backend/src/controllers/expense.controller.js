@@ -24,8 +24,8 @@ export const getExpenses = asyncHandler(async (req, res) => {
   } = req.query;
 
   // Parse and validate pagination
-  const pageNum = Math.max(1, parseInt(page));
-  const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
+  const pageNum = Math.max(1, parseInt(page) || 1);
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 20));
   const skip = (pageNum - 1) * limitNum;
 
   // Build where clause
@@ -110,7 +110,9 @@ export const getExpenses = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: expenses,
+    data: {
+      expenses,
+    },
     pagination: {
       page: pageNum,
       limit: limitNum,
@@ -118,7 +120,7 @@ export const getExpenses = asyncHandler(async (req, res) => {
       pages: totalPages,
     },
     summary: {
-      totalAmount: summary._sum.amount || 0,
+      totalAmount: summary._sum.amount ? summary._sum.amount.toString() : '0',
       count: summary._count,
     },
     message: 'Expenses retrieved successfully',
@@ -170,7 +172,7 @@ export const createExpense = asyncHandler(async (req, res) => {
   const expense = await prisma.expense.create({
     data: {
       userId,
-      amount: parseFloat(amount),
+      amount: amount.toString(),
       categoryId,
       description,
       date: expenseDate,
@@ -290,7 +292,7 @@ export const updateExpense = asyncHandler(async (req, res) => {
   const updatedExpense = await prisma.expense.update({
     where: { id },
     data: {
-      amount: amount !== undefined ? parseFloat(amount) : expense.amount,
+      amount: amount !== undefined ? amount.toString() : expense.amount,
       categoryId: categoryId || expense.categoryId,
       description: description || expense.description,
       date: date ? new Date(date) : expense.date,

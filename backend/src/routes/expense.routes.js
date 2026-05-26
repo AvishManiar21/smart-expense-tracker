@@ -14,6 +14,7 @@ import {
   validateUpdateExpense,
   validateBulkImport,
 } from '../middleware/expense.validation.js';
+import { BadRequestError } from '../utils/errors.js';
 
 const router = express.Router();
 
@@ -27,7 +28,7 @@ const upload = multer({
     if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
       cb(null, true);
     } else {
-      cb(new Error('Only CSV files are allowed'));
+      cb(new BadRequestError('Only CSV files are allowed'));
     }
   },
 });

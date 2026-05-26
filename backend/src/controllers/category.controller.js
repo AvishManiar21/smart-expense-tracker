@@ -92,7 +92,7 @@ export const createCategory = asyncHandler(async (req, res) => {
       name,
       icon,
       color,
-      budgetLimit: budgetLimit || null,
+      budgetLimit: budgetLimit !== undefined ? budgetLimit : null,
       isDefault: false,
     },
   });

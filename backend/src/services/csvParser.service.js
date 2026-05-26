@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { promises as fsPromises } from 'fs';
 import { parse } from 'csv-parse';
 import { prisma } from '../server.js';
 
@@ -150,19 +151,17 @@ export async function parseExpenseCSV(filePath, userId) {
           }
         }
 
-        // Clean up uploaded file
-        try {
-          fs.unlinkSync(filePath);
-        } catch (err) {
-          console.error('Failed to delete uploaded file:', err);
-        }
+        // Clean up uploaded file asynchronously
+        fsPromises
+          .unlink(filePath)
+          .catch((err) => console.error('Failed to delete uploaded file:', err));
 
         resolve({ validExpenses, errors });
       })
-      .on('error', (error) => {
+      .on('error', async (error) => {
         // Clean up uploaded file on error
         try {
-          fs.unlinkSync(filePath);
+          await fsPromises.unlink(filePath);
         } catch (err) {
           console.error('Failed to delete uploaded file:', err);
         }

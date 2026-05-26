@@ -15,6 +15,7 @@ function ExpenseFilters({ filters, onFiltersChange, categories }) {
 
   const handleClearFilters = () => {
     onFiltersChange({
+      ...filters,
       startDate: '',
       endDate: '',
       categoryId: '',
@@ -25,7 +26,16 @@ function ExpenseFilters({ filters, onFiltersChange, categories }) {
     });
   };
 
-  const hasActiveFilters = Object.values(filters).some((value) => value !== '');
+  // Check if any actual filter (not pagination/sort) is active
+  const hasActiveFilters = !!(
+    filters.startDate ||
+    filters.endDate ||
+    filters.categoryId ||
+    filters.paymentMethod ||
+    filters.minAmount ||
+    filters.maxAmount ||
+    filters.search
+  );
 
   return (
     <div className="bg-white rounded-lg shadow p-4">
