@@ -31,7 +31,7 @@ function RecurringPage() {
   const deleteRecurring = useDeleteRecurring();
   const processRecurring = useProcessRecurring();
 
-  const recurringExpenses = recurringData?.data || [];
+  const recurringExpenses = recurringData?.data?.recurring || [];
   const categories = categoriesData?.data?.categories || [];
 
   const {
