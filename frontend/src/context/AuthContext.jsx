@@ -24,13 +24,25 @@ export function AuthProvider({ children }) {
           setUser(response.data.user);
         } catch (err) {
           console.error('Failed to load user:', err);
-          localStorage.removeItem('accessToken');
+          // Token will be cleared by api interceptor
         }
       }
       setLoading(false);
     };
 
     loadUser();
+
+    // Listen for logout events from API interceptor
+    const handleLogoutEvent = () => {
+      setUser(null);
+      setError(null);
+    };
+
+    window.addEventListener('auth:logout', handleLogoutEvent);
+
+    return () => {
+      window.removeEventListener('auth:logout', handleLogoutEvent);
+    };
   }, []);
 
   /**
@@ -77,7 +89,7 @@ export function AuthProvider({ children }) {
       console.error('Logout error:', err);
       // Still clear user even if API call fails
       setUser(null);
-      localStorage.removeItem('accessToken');
+      // Token cleared by authService.logout()
     }
   };
 

@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { ConflictError, UnauthorizedError, ValidationError } from '../utils/errors.js';
 import { hashPassword, comparePassword, validatePasswordStrength } from '../utils/password.js';
 import { generateTokenPair, verifyRefreshToken } from '../utils/jwt.js';
-
-const prisma = new PrismaClient();
+import { prisma } from '../server.js';
 
 /**
  * Register a new user
@@ -124,11 +122,16 @@ export const login = asyncHandler(async (req, res) => {
  * @access Private
  */
 export const logout = asyncHandler(async (req, res) => {
-  // Clear refresh token cookie
-  res.clearCookie('refreshToken');
+  // Clear refresh token cookie with same options as when set
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
 
   res.json({
     success: true,
+    data: {},
     message: 'Logout successful',
   });
 });
@@ -208,5 +211,6 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     data: { user },
+    message: 'User retrieved successfully',
   });
 });

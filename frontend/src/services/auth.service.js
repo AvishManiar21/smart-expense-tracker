@@ -1,4 +1,4 @@
-import api from './api';
+import api, { tokenManager } from './api';
 
 /**
  * Authentication service
@@ -17,8 +17,8 @@ const authService = {
   async register(userData) {
     const response = await api.post('/auth/register', userData);
     if (response.data.success) {
-      // Save access token
-      localStorage.setItem('accessToken', response.data.data.accessToken);
+      // Save access token in memory
+      tokenManager.setToken(response.data.data.accessToken);
     }
     return response.data;
   },
@@ -33,8 +33,8 @@ const authService = {
   async login(credentials) {
     const response = await api.post('/auth/login', credentials);
     if (response.data.success) {
-      // Save access token
-      localStorage.setItem('accessToken', response.data.data.accessToken);
+      // Save access token in memory
+      tokenManager.setToken(response.data.data.accessToken);
     }
     return response.data;
   },
@@ -45,8 +45,8 @@ const authService = {
    */
   async logout() {
     const response = await api.post('/auth/logout');
-    // Clear access token
-    localStorage.removeItem('accessToken');
+    // Clear access token from memory
+    tokenManager.clearToken();
     return response.data;
   },
 
@@ -64,7 +64,7 @@ const authService = {
    * @returns {boolean} True if user has access token
    */
   isAuthenticated() {
-    return !!localStorage.getItem('accessToken');
+    return !!tokenManager.getToken();
   },
 };
 

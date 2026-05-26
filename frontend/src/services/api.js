@@ -3,6 +3,24 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 /**
+ * In-memory token storage (more secure than localStorage)
+ */
+let accessToken = null;
+
+/**
+ * Token management functions
+ */
+export const tokenManager = {
+  getToken: () => accessToken,
+  setToken: (token) => {
+    accessToken = token;
+  },
+  clearToken: () => {
+    accessToken = null;
+  },
+};
+
+/**
  * Axios instance with default configuration
  */
 const api = axios.create({
@@ -18,7 +36,7 @@ const api = axios.create({
  */
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = tokenManager.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -37,8 +55,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If error is 401 and we haven't retried yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Skip refresh logic for auth endpoints (login/register failures should propagate)
+    const isAuthEndpoint = originalRequest.url?.includes('/auth/login') ||
+                          originalRequest.url?.includes('/auth/register');
+
+    // If error is 401 and we haven't retried yet and not an auth endpoint
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
@@ -50,15 +72,15 @@ api.interceptors.response.use(
         );
 
         // Save new access token
-        localStorage.setItem('accessToken', data.data.accessToken);
+        tokenManager.setToken(data.data.accessToken);
 
         // Retry the original request with new token
         originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, redirect to login
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+        // Refresh failed, clear token and emit event for app to handle
+        tokenManager.clearToken();
+        window.dispatchEvent(new CustomEvent('auth:logout'));
         return Promise.reject(refreshError);
       }
     }
