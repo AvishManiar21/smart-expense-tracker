@@ -56,3 +56,12 @@ export class ConflictError extends AppError {
     super(message, 409);
   }
 }
+
+/**
+ * Bad Request error (400)
+ */
+export class BadRequestError extends AppError {
+  constructor(message = 'Bad request') {
+    super(message, 400);
+  }
+}
