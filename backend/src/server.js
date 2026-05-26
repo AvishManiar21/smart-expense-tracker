@@ -27,9 +27,27 @@ const app = express();
 // Security middleware
 app.use(helmet());
 
-// CORS configuration
+// CORS configuration - allow multiple frontend ports for development
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:3002',
+  'http://localhost:3003',
+  'http://localhost:3004',
+  config.frontendUrl, // Also allow custom frontend URL from env
+];
+
 app.use(cors({
-  origin: config.frontendUrl,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 
