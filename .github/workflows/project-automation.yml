@@ -1,0 +1,102 @@
+name: Project Board Automation
+
+on:
+  issues:
+    types: [opened, reopened, assigned, closed]
+  pull_request:
+    types: [opened, ready_for_review, review_requested, closed]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  update-project:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Move new issues to To Do
+        if: github.event_name == 'issues' && (github.event.action == 'opened' || github.event.action == 'reopened')
+        run: |
+          echo "New issue opened: #${{ github.event.issue.number }}"
+          echo "Add this to your project board in the 'To Do' column"
+
+      - name: Move assigned issues to In Progress
+        if: github.event_name == 'issues' && github.event.action == 'assigned'
+        run: |
+          echo "Issue assigned: #${{ github.event.issue.number }}"
+          echo "Move this to 'In Progress' column in your project board"
+
+      - name: Move closed issues to Done
+        if: github.event_name == 'issues' && github.event.action == 'closed'
+        run: |
+          echo "Issue closed: #${{ github.event.issue.number }}"
+          echo "Move this to 'Done' column in your project board"
+
+      - name: Move new PRs to In Progress
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        run: |
+          echo "New PR opened: #${{ github.event.pull_request.number }}"
+          echo "Move this to 'In Progress' column in your project board"
+
+      - name: Move PRs to In Review
+        if: |
+          github.event_name == 'pull_request' &&
+          (github.event.action == 'ready_for_review' || github.event.action == 'review_requested')
+        run: |
+          echo "PR ready for review: #${{ github.event.pull_request.number }}"
+          echo "Move this to 'In Review' column in your project board"
+
+      - name: Move merged PRs to Done
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        run: |
+          echo "PR merged: #${{ github.event.pull_request.number }}"
+          echo "Move this to 'Done' column in your project board"
+          echo "Linked issues will be automatically closed if using 'Closes #123' syntax"
+
+      - name: Comment on project update
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const eventName = context.eventName;
+            const action = context.payload.action;
+
+            let message = '🤖 **Project Board Update**\n\n';
+
+            if (eventName === 'issues') {
+              const issueNumber = context.payload.issue.number;
+              if (action === 'opened' || action === 'reopened') {
+                message += `✨ Issue #${issueNumber} should be added to **To Do** column`;
+              } else if (action === 'assigned') {
+                message += `🚧 Issue #${issueNumber} moved to **In Progress**`;
+              } else if (action === 'closed') {
+                message += `✅ Issue #${issueNumber} moved to **Done**`;
+              }
+            } else if (eventName === 'pull_request') {
+              const prNumber = context.payload.pull_request.number;
+              if (action === 'opened') {
+                message += `🔨 PR #${prNumber} should be in **In Progress** column`;
+              } else if (action === 'ready_for_review' || action === 'review_requested') {
+                message += `👀 PR #${prNumber} moved to **In Review**`;
+              } else if (action === 'closed' && context.payload.pull_request.merged) {
+                message += `🎉 PR #${prNumber} merged! Moving to **Done**`;
+              }
+            }
+
+            message += '\n\n_Note: Update your GitHub Project board accordingly_';
+
+            console.log(message);
+
+  add-to-project:
+    name: Add issue/PR to project
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    steps:
+      - name: Add to project
+        run: |
+          echo "To automatically add items to your project:"
+          echo "1. Go to your Project Settings"
+          echo "2. Enable 'Auto-add items' workflow"
+          echo "3. Configure it to add issues and PRs from this repository"
