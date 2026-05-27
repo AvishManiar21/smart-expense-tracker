@@ -86,10 +86,13 @@ export const getBudgetStatus = asyncHandler(async (req, res) => {
         },
       });
 
-      const spentAmount = result._sum.amount ? parseFloat(result._sum.amount) : 0;
-      const budgetAmount = parseFloat(budget.amount);
-      const remainingAmount = budgetAmount - spentAmount;
-      const percentageUsed = budgetAmount > 0 ? (spentAmount / budgetAmount) * 100 : 0;
+      const Decimal = budget.amount.constructor;
+      const spentAmountDecimal = result._sum.amount ?? new Decimal(0);
+      const budgetAmountDecimal = budget.amount;
+      const remainingAmountDecimal = budgetAmountDecimal.minus(spentAmountDecimal);
+      const percentageUsed = budgetAmountDecimal.gt(0)
+        ? spentAmountDecimal.dividedBy(budgetAmountDecimal).times(100).toNumber()
+        : 0;
 
       // Determine status
       let status;
@@ -106,9 +109,9 @@ export const getBudgetStatus = asyncHandler(async (req, res) => {
 
       return {
         ...budget,
-        budgetAmount: budget.amount.toString(),
-        spentAmount: spentAmount.toString(),
-        remainingAmount: remainingAmount.toString(),
+        budgetAmount: budgetAmountDecimal.toString(),
+        spentAmount: spentAmountDecimal.toString(),
+        remainingAmount: remainingAmountDecimal.toString(),
         percentageUsed: Math.round(percentageUsed * 100) / 100,
         status,
         periodStart: startDate.toISOString(),
