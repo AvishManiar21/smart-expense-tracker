@@ -29,7 +29,7 @@ export default function InsightsPanel({ insights, loading, onRefresh }) {
   }
 
   // Empty state
-  if (!insights || insights.length === 0) {
+  if (!insights || !Array.isArray(insights) || insights.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center justify-between mb-6">

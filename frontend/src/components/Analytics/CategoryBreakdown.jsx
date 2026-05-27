@@ -27,7 +27,7 @@ export default function CategoryBreakdown({ categories, loading, currency = 'USD
   }
 
   // Empty state
-  if (!categories || categories.length === 0) {
+  if (!categories || !Array.isArray(categories) || categories.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Category Breakdown</h3>

@@ -6,8 +6,17 @@ import PropTypes from 'prop-types';
  * Displays category breakdown as a donut chart
  */
 export default function ExpensePieChart({ data, currency = 'USD', loading }) {
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   // Empty state
-  if (!loading && (!data || data.length === 0)) {
+  if (!data || !Array.isArray(data) || data.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-gray-500">
         <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,15 +24,6 @@ export default function ExpensePieChart({ data, currency = 'USD', loading }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
         </svg>
         <p className="text-sm">No expense data for this period</p>
-      </div>
-    );
-  }
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
