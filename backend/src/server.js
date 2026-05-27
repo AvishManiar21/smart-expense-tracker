@@ -14,6 +14,7 @@ import expenseRoutes from './routes/expense.routes.js';
 import incomeRoutes from './routes/income.routes.js';
 import budgetRoutes from './routes/budget.routes.js';
 import recurringRoutes from './routes/recurring.routes.js';
+import analyticsRoutes from './routes/analytics.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -91,6 +92,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/income', incomeRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/recurring', recurringRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // 404 handler
 app.use((req, res) => {
