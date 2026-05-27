@@ -172,7 +172,7 @@ function DashboardPage() {
         {/* Summary Cards */}
         <div className="mb-8">
           <SummaryCards
-            summary={summaryData?.data}
+            summary={summaryData?.data?.data}
             loading={summaryLoading}
             currency={user?.currency || 'USD'}
           />
@@ -186,7 +186,7 @@ function DashboardPage() {
               Spending by Category
             </h3>
             <ExpensePieChart
-              data={categoryData?.data}
+              data={categoryData?.data?.data}
               loading={categoryLoading}
               currency={user?.currency || 'USD'}
             />
@@ -198,7 +198,7 @@ function DashboardPage() {
               Spending Trends
             </h3>
             <SpendingTrendChart
-              data={trendsData?.data}
+              data={trendsData?.data?.data}
               loading={trendsLoading}
               currency={user?.currency || 'USD'}
               onPeriodChange={setTrendsPeriod}
@@ -209,7 +209,7 @@ function DashboardPage() {
         {/* AI Insights */}
         <div className="mb-8">
           <InsightsPanel
-            insights={insightsData?.data}
+            insights={insightsData?.data?.data}
             loading={insightsLoading}
             onRefresh={refetchInsights}
           />

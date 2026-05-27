@@ -187,32 +187,32 @@ function AnalyticsPage() {
         </div>
 
         {/* Summary Stats Bar */}
-        {summaryData?.data && (
+        {summaryData?.data?.data && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-white rounded-lg shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Total Expenses</p>
               <p className="text-2xl font-bold text-red-600">
-                ${parseFloat(summaryData.data.totalExpenses).toFixed(2)}
+                ${parseFloat(summaryData.data.data.totalExpenses).toFixed(2)}
               </p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Total Income</p>
               <p className="text-2xl font-bold text-green-600">
-                ${parseFloat(summaryData.data.totalIncome).toFixed(2)}
+                ${parseFloat(summaryData.data.data.totalIncome).toFixed(2)}
               </p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Net Savings</p>
               <p className={`text-2xl font-bold ${
-                parseFloat(summaryData.data.netSavings) >= 0 ? 'text-green-600' : 'text-red-600'
+                parseFloat(summaryData.data.data.netSavings) >= 0 ? 'text-green-600' : 'text-red-600'
               }`}>
-                ${parseFloat(summaryData.data.netSavings).toFixed(2)}
+                ${parseFloat(summaryData.data.data.netSavings).toFixed(2)}
               </p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Savings Rate</p>
               <p className="text-2xl font-bold text-blue-600">
-                {parseFloat(summaryData.data.savingsRate).toFixed(1)}%
+                {parseFloat(summaryData.data.data.savingsRate).toFixed(1)}%
               </p>
             </div>
           </div>
@@ -268,7 +268,7 @@ function AnalyticsPage() {
                       Spending by Category
                     </h3>
                     <ExpensePieChart
-                      data={categoryData?.data}
+                      data={categoryData?.data?.data}
                       loading={categoryLoading}
                       currency={user?.currency || 'USD'}
                     />
@@ -280,7 +280,7 @@ function AnalyticsPage() {
                       Spending Trends
                     </h3>
                     <SpendingTrendChart
-                      data={trendsData?.data}
+                      data={trendsData?.data?.data}
                       loading={trendsLoading}
                       currency={user?.currency || 'USD'}
                       onPeriodChange={setTrendsPeriod}
@@ -295,7 +295,7 @@ function AnalyticsPage() {
                       Month-over-Month Comparison
                     </h3>
                     <MonthlyComparisonChart
-                      data={comparisonData?.data}
+                      data={comparisonData?.data?.data?.comparison}
                       loading={comparisonLoading}
                       currency={user?.currency || 'USD'}
                     />
@@ -307,7 +307,7 @@ function AnalyticsPage() {
                       Income vs Expenses (12 Months)
                     </h3>
                     <IncomeVsExpenseChart
-                      data={incomeVsExpenseData?.data}
+                      data={incomeVsExpenseData?.data?.data}
                       loading={incomeVsExpenseLoading}
                       currency={user?.currency || 'USD'}
                     />
@@ -325,7 +325,7 @@ function AnalyticsPage() {
                   </h3>
                   <div className="h-96">
                     <SpendingTrendChart
-                      data={trendsData?.data}
+                      data={trendsData?.data?.data}
                       loading={trendsLoading}
                       currency={user?.currency || 'USD'}
                       onPeriodChange={setTrendsPeriod}
@@ -339,7 +339,7 @@ function AnalyticsPage() {
                   </h3>
                   <div className="h-96">
                     <IncomeVsExpenseChart
-                      data={incomeVsExpenseData?.data}
+                      data={incomeVsExpenseData?.data?.data}
                       loading={incomeVsExpenseLoading}
                       currency={user?.currency || 'USD'}
                     />
@@ -352,7 +352,7 @@ function AnalyticsPage() {
                   </h3>
                   <div className="h-96">
                     <MonthlyComparisonChart
-                      data={comparisonData?.data}
+                      data={comparisonData?.data?.data?.comparison}
                       loading={comparisonLoading}
                       currency={user?.currency || 'USD'}
                     />
@@ -371,7 +371,7 @@ function AnalyticsPage() {
                     </h3>
                     <div className="h-80">
                       <ExpensePieChart
-                        data={categoryData?.data}
+                        data={categoryData?.data?.data}
                         loading={categoryLoading}
                         currency={user?.currency || 'USD'}
                       />
@@ -383,7 +383,7 @@ function AnalyticsPage() {
                     </h3>
                     <div className="h-80">
                       <MonthlyComparisonChart
-                        data={comparisonData?.data}
+                        data={comparisonData?.data?.data?.comparison}
                         loading={comparisonLoading}
                         currency={user?.currency || 'USD'}
                       />
@@ -396,7 +396,7 @@ function AnalyticsPage() {
                     Detailed Category Breakdown
                   </h3>
                   <CategoryBreakdown
-                    categories={categoryData?.data}
+                    categories={categoryData?.data?.data}
                     loading={categoryLoading}
                     currency={user?.currency || 'USD'}
                   />
@@ -408,7 +408,7 @@ function AnalyticsPage() {
             {activeTab === 'insights' && (
               <div>
                 <InsightsPanel
-                  insights={insightsData?.data}
+                  insights={insightsData?.data?.data}
                   loading={insightsLoading}
                   onRefresh={refetchInsights}
                 />
