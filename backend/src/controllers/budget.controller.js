@@ -129,7 +129,7 @@ export const getBudgetStatus = asyncHandler(async (req, res) => {
 });
 
 /**
- * Get budget alerts (budgets over 80%)
+ * Get budget alerts (budgets over 70%)
  * @route GET /api/budgets/alerts
  * @access Private
  */

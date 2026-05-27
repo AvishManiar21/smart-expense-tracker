@@ -27,15 +27,19 @@ const app = express();
 // Security middleware
 app.use(helmet());
 
-// CORS configuration - allow multiple frontend ports for development
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:3002',
-  'http://localhost:3003',
-  'http://localhost:3004',
-  config.frontendUrl, // Also allow custom frontend URL from env
-];
+// CORS configuration
+const allowedOrigins = [config.frontendUrl];
+
+// Only allow multiple localhost origins in development
+if (config.nodeEnv === 'development') {
+  allowedOrigins.push(
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'http://localhost:3004'
+  );
+}
 
 app.use(cors({
   origin: (origin, callback) => {

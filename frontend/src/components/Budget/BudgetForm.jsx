@@ -32,7 +32,7 @@ export default function BudgetForm({ budget, onSubmit, onCancel, isLoading }) {
   const onFormSubmit = (data) => {
     onSubmit({
       ...data,
-      amount: parseFloat(data.amount),
+      amount: data.amount, // Keep as string for precise decimal handling
     });
   };
 

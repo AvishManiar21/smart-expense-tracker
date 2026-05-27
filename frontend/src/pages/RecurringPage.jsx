@@ -53,7 +53,7 @@ function RecurringPage() {
     try {
       const payload = {
         ...data,
-        amount: parseFloat(data.amount),
+        amount: data.amount, // Keep as string for precise decimal handling
       };
 
       if (editingRecurring) {
@@ -77,7 +77,7 @@ function RecurringPage() {
       categoryId: recurring.categoryId,
       description: recurring.description,
       frequency: recurring.frequency,
-      startDate: format(new Date(recurring.startDate), 'yyyy-MM-dd'),
+      startDate: recurring.nextOccurrence ? format(new Date(recurring.nextOccurrence), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
     });
     setIsFormOpen(true);
   };

@@ -37,9 +37,8 @@ export default function IncomeForm({ income, onSubmit, onCancel, isLoading }) {
   const onFormSubmit = (data) => {
     onSubmit({
       ...data,
-      amount: data.amount,
+      amount: data.amount, // Keep as string for precise decimal handling
     });
-  };
   };
 
   return (

@@ -79,9 +79,9 @@ export const createRecurring = asyncHandler(async (req, res) => {
     throw new BadRequestError('Invalid category');
   }
 
-  // Calculate next occurrence
-  const start = startDate ? new Date(startDate) : new Date();
-  const nextOccurrence = calculateNextOccurrence(start, frequency);
+  // Set next occurrence to start date (first due date)
+  // processRecurring will create expense and advance to next occurrence
+  const nextOccurrence = startDate ? new Date(startDate) : new Date();
 
   const recurring = await prisma.recurringExpense.create({
     data: {
@@ -236,34 +236,40 @@ export const processRecurring = asyncHandler(async (req, res) => {
   for (const recurring of dueRecurring) {
     let currentOccurrence = new Date(recurring.nextOccurrence);
     let iterations = 0;
+    const expensesToCreate = [];
 
-    // Loop to catch up on all missed occurrences
+    // Collect all due occurrences
     while (currentOccurrence <= today && iterations < MAX_CATCH_UP_ITERATIONS) {
-      // Create expense from recurring template
-      await prisma.expense.create({
-        data: {
-          userId,
-          amount: recurring.amount,
-          categoryId: recurring.categoryId,
-          description: recurring.description,
-          date: currentOccurrence,
-          paymentMethod: 'card', // Default for recurring
-          isRecurring: true,
-          recurringId: recurring.id,
-        },
+      expensesToCreate.push({
+        userId,
+        amount: recurring.amount,
+        categoryId: recurring.categoryId,
+        description: recurring.description,
+        date: new Date(currentOccurrence),
+        paymentMethod: 'card', // Default for recurring
+        isRecurring: true,
+        recurringId: recurring.id,
       });
 
-      processedCount++;
       iterations++;
-
-      // Calculate next occurrence
       currentOccurrence = calculateNextOccurrence(currentOccurrence, recurring.frequency);
     }
 
-    // Update the recurring template with the new next occurrence
-    await prisma.recurringExpense.update({
-      where: { id: recurring.id },
-      data: { nextOccurrence: currentOccurrence },
+    // Use transaction to ensure atomicity
+    await prisma.$transaction(async (tx) => {
+      // Create all expenses at once
+      if (expensesToCreate.length > 0) {
+        await tx.expense.createMany({
+          data: expensesToCreate,
+        });
+        processedCount += expensesToCreate.length;
+      }
+
+      // Update the recurring template with the new next occurrence
+      await tx.recurringExpense.update({
+        where: { id: recurring.id },
+        data: { nextOccurrence: currentOccurrence },
+      });
     });
 
     // Warn if we hit the safety limit

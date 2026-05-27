@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import {
   getIncome,
   getIncomeById,
@@ -12,7 +12,7 @@ export function useIncome(filters = {}) {
     queryKey: ['income', filters],
     queryFn: () => getIncome(filters),
     staleTime: 30000,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData, // v5 syntax
   });
 }
 
