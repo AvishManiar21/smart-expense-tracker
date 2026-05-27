@@ -37,8 +37,9 @@ export default function IncomeForm({ income, onSubmit, onCancel, isLoading }) {
   const onFormSubmit = (data) => {
     onSubmit({
       ...data,
-      amount: parseFloat(data.amount),
+      amount: data.amount,
     });
+  };
   };
 
   return (
