@@ -11,6 +11,9 @@ import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import expenseRoutes from './routes/expense.routes.js';
+import incomeRoutes from './routes/income.routes.js';
+import budgetRoutes from './routes/budget.routes.js';
+import recurringRoutes from './routes/recurring.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -25,8 +28,30 @@ const app = express();
 app.use(helmet());
 
 // CORS configuration
+const allowedOrigins = [config.frontendUrl];
+
+// Only allow multiple localhost origins in development
+if (config.nodeEnv === 'development') {
+  allowedOrigins.push(
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'http://localhost:3004'
+  );
+}
+
 app.use(cors({
-  origin: config.frontendUrl,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 
@@ -63,6 +88,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/income', incomeRoutes);
+app.use('/api/budgets', budgetRoutes);
+app.use('/api/recurring', recurringRoutes);
 
 // 404 handler
 app.use((req, res) => {
