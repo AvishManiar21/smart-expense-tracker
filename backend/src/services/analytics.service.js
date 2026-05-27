@@ -1,4 +1,4 @@
-import prisma from '../config/database.js';
+import { prisma } from '../server.js';
 import { startOfMonth, endOfMonth, subMonths, format, differenceInDays } from 'date-fns';
 
 /**

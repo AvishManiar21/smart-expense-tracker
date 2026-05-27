@@ -7,7 +7,7 @@ import {
   getComparison,
   getIncomeVsExpense,
 } from '../controllers/analytics.controller.js';
-import { authenticate } from '../middleware/auth.middleware.js';
+import { authenticate } from '../middleware/authenticate.js';
 
 const router = express.Router();
 

@@ -9,6 +9,7 @@ import ExpensesPage from './pages/ExpensesPage';
 import IncomePage from './pages/IncomePage';
 import BudgetPage from './pages/BudgetPage';
 import RecurringPage from './pages/RecurringPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 // Create a query client
@@ -72,6 +73,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <RecurringPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute>
+                  <AnalyticsPage />
                 </ProtectedRoute>
               }
             />

@@ -4,9 +4,9 @@ import {
   groupByCategory,
   generateInsights,
 } from '../services/analytics.service.js';
-import prisma from '../config/database.js';
+import { prisma } from '../server.js';
 import { startOfMonth, endOfMonth, subMonths, format, differenceInDays } from 'date-fns';
-import asyncHandler from '../middleware/asyncHandler.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
 /**
  * Get monthly summary with key metrics
