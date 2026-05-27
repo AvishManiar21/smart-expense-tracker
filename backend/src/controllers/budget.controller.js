@@ -297,6 +297,22 @@ export const updateBudget = asyncHandler(async (req, res) => {
     throw new NotFoundError('Budget not found');
   }
 
+  // Check for unique constraint violation if period is being changed
+  if (period && period !== budget.period) {
+    const existing = await prisma.budget.findFirst({
+      where: {
+        userId,
+        categoryId: budget.categoryId,
+        period,
+        id: { not: id }, // Exclude current budget
+      },
+    });
+
+    if (existing) {
+      throw new ConflictError(`A ${period} budget already exists for this category`);
+    }
+  }
+
   const updatedBudget = await prisma.budget.update({
     where: { id },
     data: {
