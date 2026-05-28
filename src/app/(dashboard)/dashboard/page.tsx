@@ -1,10 +1,10 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { SummaryCards } from '@/components/dashboard/summary-cards';
-import { ExpensePieChart } from '@/components/charts/expense-pie-chart';
-import { SpendingTrendChart } from '@/components/charts/spending-trend-chart';
-import { InsightsPanel } from '@/components/dashboard/insights-panel';
-import { RecentTransactions } from '@/components/dashboard/recent-transactions';
+import { SummaryCards } from '@/components/features/dashboard/summary-cards';
+import { ExpensePieChart } from '@/components/features/dashboard/expense-pie-chart';
+import { SpendingTrendChart } from '@/components/features/dashboard/spending-trend-chart';
+import { InsightsPanel } from '@/components/features/dashboard/insights-panel';
+import { RecentTransactions } from '@/components/features/dashboard/recent-transactions';
 import { formatCurrency, getCurrentMonth } from '@/lib/utils/date';
 
 /**

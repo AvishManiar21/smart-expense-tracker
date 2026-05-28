@@ -1,13 +1,13 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SummaryCards } from '@/components/dashboard/summary-cards';
-import { ExpensePieChart } from '@/components/charts/expense-pie-chart';
-import { SpendingTrendChart } from '@/components/charts/spending-trend-chart';
-import { MonthlyComparisonChart } from '@/components/charts/monthly-comparison-chart';
-import { IncomeExpenseChart } from '@/components/charts/income-expense-chart';
-import { CategoryBreakdownTable } from '@/components/analytics/category-breakdown-table';
-import { InsightsPanel } from '@/components/dashboard/insights-panel';
+import { SummaryCards } from '@/components/features/dashboard/summary-cards';
+import { ExpensePieChart } from '@/components/features/dashboard/expense-pie-chart';
+import { SpendingTrendChart } from '@/components/features/dashboard/spending-trend-chart';
+import { MonthlyComparisonChart } from '@/components/features/dashboard/monthly-comparison-chart';
+import { IncomeExpenseChart } from '@/components/features/dashboard/income-expense-chart';
+import { CategoryBreakdownTable } from '@/components/features/analytics/category-breakdown-table';
+import { InsightsPanel } from '@/components/features/dashboard/insights-panel';
 import { formatCurrency, getCurrentMonth } from '@/lib/utils/date';
 
 /**
