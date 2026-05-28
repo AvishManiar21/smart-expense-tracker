@@ -218,7 +218,7 @@ function DashboardPage() {
         {/* Recent Transactions */}
         <div>
           <RecentTransactions
-            transactions={expensesData?.data?.data || []}
+            transactions={expensesData?.data?.expenses || []}
             loading={expensesLoading}
             currency={user?.currency || 'USD'}
           />

@@ -15,7 +15,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
  * @access Private
  */
 export const getSummary = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const monthParam = req.query.month;
 
   // Parse month or use current
@@ -124,7 +124,7 @@ export const getSummary = asyncHandler(async (req, res) => {
  * @access Private
  */
 export const getTrends = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const period = req.query.period || '6months';
 
   let monthsToFetch;
@@ -176,7 +176,7 @@ export const getTrends = asyncHandler(async (req, res) => {
  * @access Private
  */
 export const getCategoryBreakdown = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const monthParam = req.query.month;
 
   // Parse month or use current
@@ -235,7 +235,7 @@ export const getCategoryBreakdown = asyncHandler(async (req, res) => {
  * @access Private
  */
 export const getInsights = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const monthParam = req.query.month;
 
   // Parse month or use current
@@ -263,7 +263,7 @@ export const getInsights = asyncHandler(async (req, res) => {
  * @access Private
  */
 export const getComparison = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const monthParam = req.query.month;
 
   // Parse month or use current
@@ -330,7 +330,7 @@ export const getComparison = asyncHandler(async (req, res) => {
  * @access Private
  */
 export const getIncomeVsExpense = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const data = [];
   const now = new Date();
 
