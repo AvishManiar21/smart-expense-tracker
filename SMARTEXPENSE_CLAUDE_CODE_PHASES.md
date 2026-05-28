@@ -10,26 +10,34 @@
 ```
 PROJECT: SmartExpense Tracker
 STACK:
-  - Frontend: React 18 + JavaScript + Vite + Tailwind CSS + Recharts
-  - Backend: Node.js 20 + Express.js + Prisma ORM
-  - Database: PostgreSQL
-  - Auth: JWT + Refresh Tokens
-  - Testing: Jest + React Testing Library + Supertest
+  - Framework:  Next.js 14 with App Router (TypeScript strict mode)
+  - Language:   TypeScript everywhere (no JavaScript)
+  - Database:   PostgreSQL (port 5433)
+  - ORM:        Drizzle ORM (drizzle-orm/pg-core)
+  - Auth:       NextAuth.js v5 (beta) with JWT sessions
+  - Styling:    Tailwind CSS + Shadcn/ui + class-variance-authority
+  - Charts:     Recharts
+  - Forms:      React Hook Form + Zod (@hookform/resolvers)
+  - Data Fetch: TanStack Query + fetch API (Next.js extended)
+  - Testing:    Vitest + React Testing Library + Playwright
+  - Deployment: Vercel (single deployment - frontend + backend together)
 
 AGENTS AVAILABLE:
-  - Web Development Agent   → src/agents/web-dev-agent/index.js
-  - Data Analysis Agent     → src/agents/data-analysis-agent/index.js
-  - DevOps Agent            → src/agents/devops-agent/index.js
-  - General Purpose Agent   → src/agents/general-purpose-agent/index.js
+  - Web Development Agent   → .claude/agents/web-dev-agent.md
+  - Data Analysis Agent     → .claude/agents/data-analysis-agent.md
+  - DevOps Agent            → .claude/agents/devops-agent.md
+  - General Purpose Agent   → .claude/agents/general-purpose-agent.md
 
 RULES:
-  - Always use JavaScript (no TypeScript)
-  - Always add PropTypes for React components
-  - Always add JSDoc comments
-  - Always include error handling
-  - Always follow RESTful conventions
-  - Always validate inputs on both frontend and backend
-  - File structure must match the project plan exactly
+  - Always use TypeScript with strict mode (no any types)
+  - Always define interfaces and types for all data structures
+  - Always use Zod for validation (both server and client)
+  - Always use Shadcn/ui components (not custom from scratch)
+  - Always use Next.js App Router patterns (not Pages Router)
+  - Always use Server Components by default, Client Components only when needed
+  - Always use Drizzle ORM (never raw SQL)
+  - Always use NextAuth.js session (never manual JWT)
+  - File structure must match Next.js 14 App Router conventions exactly
 ```
 
 ---
@@ -37,38 +45,64 @@ RULES:
 ## 🗂️ PROJECT STRUCTURE REFERENCE
 ```
 smart-expense-tracker/
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Auth/
-│   │   │   ├── Dashboard/
-│   │   │   ├── Expenses/
-│   │   │   ├── Income/
-│   │   │   ├── Budget/
-│   │   │   ├── Analytics/
-│   │   │   ├── Reports/
-│   │   │   └── Common/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── hooks/
-│   │   ├── context/
-│   │   ├── utils/
-│   │   └── styles/
-│   ├── package.json
-│   └── vite.config.js
-├── backend/
-│   ├── src/
-│   │   ├── routes/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── services/
-│   │   └── utils/
-│   ├── prisma/
-│   │   └── schema.prisma
-│   └── package.json
+├── src/
+│   ├── app/                        (Next.js App Router)
+│   │   ├── (auth)/                 (Route group - no layout)
+│   │   │   ├── login/page.tsx
+│   │   │   ├── register/page.tsx
+│   │   │   └── forgot-password/page.tsx
+│   │   ├── (dashboard)/            (Route group - with layout)
+│   │   │   ├── layout.tsx          (Sidebar + Navbar)
+│   │   │   ├── dashboard/page.tsx
+│   │   │   ├── expenses/page.tsx
+│   │   │   ├── income/page.tsx
+│   │   │   ├── budget/page.tsx
+│   │   │   ├── analytics/page.tsx
+│   │   │   ├── reports/page.tsx
+│   │   │   └── settings/page.tsx
+│   │   ├── api/                    (API Route Handlers)
+│   │   │   ├── auth/[...nextauth]/route.ts
+│   │   │   ├── expenses/route.ts
+│   │   │   ├── expenses/[id]/route.ts
+│   │   │   ├── income/route.ts
+│   │   │   ├── categories/route.ts
+│   │   │   ├── budgets/route.ts
+│   │   │   ├── analytics/route.ts
+│   │   │   └── reports/route.ts
+│   │   ├── layout.tsx              (Root layout)
+│   │   └── page.tsx                (Root page → redirect)
+│   ├── components/
+│   │   ├── ui/                     (Shadcn/ui components)
+│   │   ├── auth/
+│   │   ├── dashboard/
+│   │   ├── expenses/
+│   │   ├── income/
+│   │   ├── budget/
+│   │   ├── analytics/
+│   │   ├── reports/
+│   │   └── common/
+│   ├── lib/
+│   │   ├── db/                     (Drizzle ORM)
+│   │   │   ├── index.ts            (DB connection)
+│   │   │   ├── schema.ts           (All table definitions)
+│   │   │   └── seed.ts             (Seed data)
+│   │   ├── auth/
+│   │   │   ├── auth.ts             (NextAuth config)
+│   │   │   └── auth.config.ts
+│   │   ├── validations/            (Zod schemas)
+│   │   ├── utils/                  (Helper functions)
+│   │   └── hooks/                  (Custom React hooks)
+│   ├── types/                      (TypeScript interfaces)
+│   └── middleware.ts               (NextAuth middleware)
+├── drizzle/                        (Drizzle migrations)
+├── public/
 ├── docker-compose.yml
-├── .github/workflows/
-└── README.md
+├── drizzle.config.ts
+├── next.config.ts
+├── tailwind.config.ts
+├── tsconfig.json
+├── vitest.config.ts
+└── .env.example
 ```
 
 ---
@@ -77,16 +111,16 @@ smart-expense-tracker/
 
 | # | Phase Name | Agent(s) Used | Day | Key Deliverables |
 |---|-----------|---------------|-----|-----------------|
-| **1** | Foundation & Project Setup | General Purpose + DevOps | 1-2 | Folder structure, Docker, Prisma schema, env config, seed data |
-| **2** | Authentication System | Web Dev | 3-4 | Register, login, JWT, password reset, protected routes, auth UI |
-| **3** | Expense Management | Web Dev | 5-7 | Expense CRUD, categories, filters, pagination, CSV import |
+| **1** | Foundation & Project Setup | General Purpose + DevOps | 1-2 | Next.js init, Docker, Drizzle schema, env config, seed data |
+| **2** | Authentication System | Web Dev | 3-4 | NextAuth.js v5, login, register, password reset, middleware |
+| **3** | Expense Management | Web Dev | 5-7 | Expense CRUD API routes, categories, filters, pagination, CSV |
 | **4** | Income & Budget Management | Web Dev | 8-9 | Income tracking, budgets, recurring expenses, alerts, layout |
-| **5** | Analytics & Dashboard | Data Analysis + Web Dev | 10-12 | Dashboard, pie/line/bar charts, AI insights, spending trends |
+| **5** | Analytics & Dashboard | Data Analysis + Web Dev | 10-12 | Dashboard, Recharts, Server Components, AI insights |
 | **6** | Reports & Export | Data Analysis + Web Dev | 13-14 | Monthly/yearly reports, PDF export, CSV export, date ranges |
-| **7** | Settings & User Profile | Web Dev | 15 | Profile editing, password change, category manager, account stats |
-| **8** | Testing & Quality Assurance | Web Dev + General Purpose | 16-17 | Jest tests, ESLint, Prettier, security audit, performance check |
-| **9** | CI/CD & Deployment | DevOps | 18-19 | GitHub Actions, Railway backend, Vercel frontend, Sentry monitoring |
-| **10** | Final Polish & Optimization | General Purpose + Web Dev | 20 | Lazy loading, error boundaries, accessibility, docs, launch checklist |
+| **7** | Settings & User Profile | Web Dev | 15 | Profile editing, password change, category manager, stats |
+| **8** | Testing & Quality Assurance | Web Dev + General Purpose | 16-17 | Vitest, Playwright E2E, TypeScript checks, security audit |
+| **9** | CI/CD & Deployment | DevOps | 18-19 | GitHub Actions, Vercel deploy, Sentry, Vercel Analytics |
+| **10** | Final Polish & Optimization | General Purpose + Web Dev | 20 | Suspense, error boundaries, accessibility, docs, launch |
 
 ---
 
@@ -95,15 +129,15 @@ smart-expense-tracker/
 ```bash
 # How to run each phase — just say this in Claude Code:
 
-"Execute Phase 1"    →  Project setup, Docker, database schema
-"Execute Phase 2"    →  Authentication (register, login, JWT)
+"Execute Phase 1"    →  Next.js setup, Docker, Drizzle schema
+"Execute Phase 2"    →  NextAuth.js v5 authentication
 "Execute Phase 3"    →  Expense CRUD, categories, CSV import
 "Execute Phase 4"    →  Income, budgets, recurring, layout
 "Execute Phase 5"    →  Dashboard, charts, analytics, insights
 "Execute Phase 6"    →  Reports, PDF/CSV export
 "Execute Phase 7"    →  Settings, profile, categories
-"Execute Phase 8"    →  Tests, linting, security audit
-"Execute Phase 9"    →  CI/CD, deploy to Railway + Vercel
+"Execute Phase 8"    →  Vitest, Playwright, TypeScript audit
+"Execute Phase 9"    →  CI/CD, deploy to Vercel, monitoring
 "Execute Phase 10"   →  Polish, optimize, document, launch
 
 # Other useful commands:
@@ -118,19 +152,19 @@ smart-expense-tracker/
 
 ## 📊 PHASE METRICS OVERVIEW
 
-| Phase | Files Created | API Endpoints | Components | Tests |
-|-------|:------------:|:-------------:|:----------:|:-----:|
-| Phase 1 | ~25 | 0 | 0 | 0 |
-| Phase 2 | ~20 | 6 | 4 | ✅ |
-| Phase 3 | ~25 | 10 | 8 | ✅ |
-| Phase 4 | ~30 | 15 | 12 | ✅ |
-| Phase 5 | ~20 | 6 | 8 | ✅ |
-| Phase 6 | ~15 | 5 | 6 | ✅ |
-| Phase 7 | ~10 | 5 | 5 | ✅ |
+| Phase | Files Created | API Routes | Components | Tests |
+|-------|:------------:|:----------:|:----------:|:-----:|
+| Phase 1 | ~20 | 0 | 0 | 0 |
+| Phase 2 | ~15 | 6 | 4 | ✅ |
+| Phase 3 | ~20 | 8 | 8 | ✅ |
+| Phase 4 | ~25 | 12 | 12 | ✅ |
+| Phase 5 | ~18 | 5 | 8 | ✅ |
+| Phase 6 | ~12 | 4 | 6 | ✅ |
+| Phase 7 | ~10 | 4 | 5 | ✅ |
 | Phase 8 | ~20 | 0 | 0 | ✅ |
-| Phase 9 | ~15 | 2 | 0 | ✅ |
+| Phase 9 | ~12 | 1 | 0 | ✅ |
 | Phase 10 | ~10 | 0 | 5 | ✅ |
-| **TOTAL** | **~190** | **~49** | **~48** | **All** |
+| **TOTAL** | **~162** | **~40** | **~48** | **All** |
 
 ---
 
@@ -146,24 +180,22 @@ smart-expense-tracker/
 │ DevOps Agent            │ Phase 1, 9                    │
 └─────────────────────────┴───────────────────────────────┘
 
-Detailed breakdown:
+General Purpose Agent → Phase 1  (project init, structure)
+                     → Phase 8   (quality checks, TypeScript audit)
+                     → Phase 10  (optimization, documentation)
 
-General Purpose Agent → Phase 1 (project init, structure)
-                     → Phase 8  (quality checks, code review)
-                     → Phase 10 (optimization, documentation)
+Web Development Agent → Phase 2  (NextAuth.js + auth UI)
+                     → Phase 3   (expenses API routes + UI)
+                     → Phase 4   (income + budget + layout)
+                     → Phase 7   (settings + profile)
+                     → Phase 8   (Vitest testing)
+                     → Phase 10  (UI polish, Suspense)
 
-Web Development Agent → Phase 2  (authentication API + UI)
-                     → Phase 3  (expenses API + UI)
-                     → Phase 4  (income + budget API + UI)
-                     → Phase 7  (settings + profile)
-                     → Phase 8  (testing)
-                     → Phase 10 (UI polish)
+Data Analysis Agent  → Phase 5   (analytics engine + insights)
+                     → Phase 6   (reports + CSV/PDF generation)
 
-Data Analysis Agent  → Phase 5  (analytics engine + insights)
-                     → Phase 6  (reports + CSV generation)
-
-DevOps Agent         → Phase 1  (Docker + environment setup)
-                     → Phase 9  (CI/CD + deployment)
+DevOps Agent         → Phase 1   (Docker + environment setup)
+                     → Phase 9   (CI/CD + Vercel deployment)
 ```
 
 ---
@@ -171,26 +203,41 @@ DevOps Agent         → Phase 1  (Docker + environment setup)
 ## 🔗 TECH STACK QUICK REFERENCE
 
 ```
-FRONTEND                          BACKEND
-─────────────────────             ──────────────────────
-React 18 (JavaScript)             Node.js 20
-Vite (build tool)                 Express.js
-React Router v6                   Prisma ORM
-TanStack Query                    PostgreSQL
-Recharts (charts)                 JWT Auth
-Tailwind CSS                      bcryptjs
-React Hook Form                   express-validator
-lucide-react (icons)              multer (uploads)
-PropTypes (validation)            PDFKit (PDF export)
-Jest + RTL (testing)              csv-parser
-                                  Jest + Supertest
-                                  
-DEVOPS                            MONITORING
-─────────────────────             ──────────────────────
-Docker + Docker Compose           Sentry (errors)
-GitHub Actions (CI/CD)            Morgan (HTTP logs)
-Railway (backend host)            Winston (app logs)
-Vercel (frontend host)            Health check endpoint
+NEXT.JS 14 (Full Stack - Single App)
+──────────────────────────────────────────────────────
+Framework        Next.js 14 App Router (TypeScript strict)
+Language         TypeScript everywhere
+Database         PostgreSQL (port 5433)
+ORM              Drizzle ORM (drizzle-orm/pg-core)
+Auth             NextAuth.js v5 (beta) - JWT sessions
+Styling          Tailwind CSS + Shadcn/ui (Radix UI)
+Icons            lucide-react
+Charts           Recharts
+Forms            React Hook Form + Zod
+Validation       Zod schemas (shared server + client)
+Data Fetching    TanStack Query + fetch API
+State            React Server Components + TanStack Query
+Password         bcryptjs (12 rounds)
+File Upload      Next.js built-in + Cloudinary
+PDF Export       PDFKit
+CSV              csv-parser + json2csv
+
+TESTING
+──────────────────────────────────────────────────────
+Unit/Component   Vitest + React Testing Library
+E2E              Playwright
+API Testing      Vitest + fetch mocking
+Type Checking    TypeScript compiler (tsc --noEmit)
+
+DEVOPS & MONITORING
+──────────────────────────────────────────────────────
+Containers       Docker + Docker Compose
+CI/CD            GitHub Actions
+Hosting          Vercel (frontend + backend together)
+Database Host    Railway (PostgreSQL)
+Error Tracking   Sentry
+Analytics        Vercel Analytics
+Logging          Next.js built-in + Winston
 ```
 
 ---
@@ -203,7 +250,7 @@ Vercel (frontend host)            Health check endpoint
 > **Trigger:** Say `"Execute Phase 1"` in Claude Code
 > **Agent:** General Purpose Agent (Primary) + DevOps Agent (Secondary)
 > **Duration:** Day 1-2
-> **Goal:** Complete project scaffolding, database schema, Docker setup, environment configuration
+> **Goal:** Next.js 14 scaffolding, Drizzle schema, Docker, env config, seed data
 
 ---
 
@@ -213,87 +260,107 @@ Vercel (frontend host)            Health check endpoint
 EXECUTE PHASE 1: Foundation & Project Setup
 AGENTS: General Purpose Agent + DevOps Agent
 
-=== TASK 1: Initialize Project Structure ===
+=== TASK 1: Initialize Next.js 14 Project ===
 
-Using the General Purpose Agent, create the complete SmartExpense Tracker project structure:
+Using the General Purpose Agent, create the SmartExpense Tracker:
 
 1. Create root directory: smart-expense-tracker/
 
-2. Initialize FRONTEND (React + Vite):
-   cd frontend
-   - Run: npm create vite@latest . -- --template react
-   - Install dependencies:
-     npm install react-router-dom axios recharts tailwindcss
-     autoprefixer postcss react-hook-form prop-types
-     @tanstack/react-query date-fns lucide-react
-   - Install dev dependencies:
-     npm install -D @testing-library/react @testing-library/jest-dom
-     @testing-library/user-event jest jest-environment-jsdom
-     eslint eslint-plugin-react prettier
-   - Initialize Tailwind: npx tailwindcss init -p
-   - Create folder structure:
-     src/components/Auth/
-     src/components/Dashboard/
-     src/components/Expenses/
-     src/components/Income/
-     src/components/Budget/
-     src/components/Analytics/
-     src/components/Reports/
-     src/components/Common/
-     src/pages/
-     src/services/
-     src/hooks/
-     src/context/
-     src/utils/
-     src/styles/
+2. Initialize Next.js 14 with TypeScript:
+   npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
 
-3. Initialize BACKEND (Node.js + Express):
-   cd backend
-   - Run: npm init -y
-   - Install dependencies:
-     npm install express prisma @prisma/client bcryptjs jsonwebtoken
-     express-validator express-rate-limit cors helmet morgan
-     dotenv multer csv-parser pdfkit nodemailer uuid
-   - Install dev dependencies:
-     npm install -D jest supertest nodemon eslint prettier
-   - Initialize Prisma: npx prisma init
-   - Create folder structure:
-     src/routes/
-     src/controllers/
-     src/middleware/
-     src/services/
-     src/utils/
-     src/config/
+3. Install core dependencies:
+   npm install next-auth@beta drizzle-orm @auth/drizzle-adapter
+   npm install pg @neondatabase/serverless
+   npm install bcryptjs
+   npm install zod @hookform/resolvers react-hook-form
+   npm install @tanstack/react-query @tanstack/react-query-devtools
+   npm install recharts
+   npm install lucide-react
+   npm install date-fns
+   npm install class-variance-authority clsx tailwind-merge
+   npm install pdfkit csv-parser json2csv nodemailer
+   npm install uuid
+
+4. Install Shadcn/ui:
+   npx shadcn-ui@latest init
+   (choose: TypeScript, Default style, Slate base color, src/app globals.css)
+
+   Then add these Shadcn components:
+   npx shadcn-ui@latest add button input label card
+   npx shadcn-ui@latest add form select checkbox radio-group
+   npx shadcn-ui@latest add dialog sheet modal
+   npx shadcn-ui@latest add table pagination
+   npx shadcn-ui@latest add dropdown-menu avatar
+   npx shadcn-ui@latest add progress badge alert
+   npx shadcn-ui@latest add tabs separator skeleton
+   npx shadcn-ui@latest add toast sonner
+   npx shadcn-ui@latest add popover calendar
+   npx shadcn-ui@latest add chart
+
+5. Install dev dependencies:
+   npm install -D drizzle-kit
+   npm install -D vitest @vitejs/plugin-react jsdom
+   npm install -D @testing-library/react @testing-library/jest-dom @testing-library/user-event
+   npm install -D playwright @playwright/test
+   npm install -D @types/bcryptjs @types/pg @types/nodemailer @types/uuid @types/pdfkit
+
+6. Create folder structure:
+   src/app/(auth)/login/
+   src/app/(auth)/register/
+   src/app/(auth)/forgot-password/
+   src/app/(auth)/reset-password/
+   src/app/(dashboard)/dashboard/
+   src/app/(dashboard)/expenses/
+   src/app/(dashboard)/income/
+   src/app/(dashboard)/budget/
+   src/app/(dashboard)/analytics/
+   src/app/(dashboard)/reports/
+   src/app/(dashboard)/settings/
+   src/app/api/auth/[...nextauth]/
+   src/app/api/expenses/
+   src/app/api/expenses/[id]/
+   src/app/api/income/
+   src/app/api/income/[id]/
+   src/app/api/categories/
+   src/app/api/categories/[id]/
+   src/app/api/budgets/
+   src/app/api/budgets/[id]/
+   src/app/api/analytics/
+   src/app/api/reports/
+   src/app/api/health/
+   src/components/ui/          (Shadcn components go here)
+   src/components/auth/
+   src/components/dashboard/
+   src/components/expenses/
+   src/components/income/
+   src/components/budget/
+   src/components/analytics/
+   src/components/reports/
+   src/components/common/
+   src/lib/db/
+   src/lib/auth/
+   src/lib/validations/
+   src/lib/utils/
+   src/lib/hooks/
+   src/types/
+   drizzle/
 
 === TASK 2: Environment Configuration ===
 
-Create the following files:
-
-FILE: backend/.env.example
+Create FILE: .env.example
 ---
-# Database
-DATABASE_URL="postgresql://postgres:password@localhost:5432/expense_tracker"
+# Database (port 5433 for new stack)
+DATABASE_URL="postgresql://postgres:password@localhost:5433/expense_tracker"
 
-# JWT Secrets
-JWT_SECRET="your-super-secret-jwt-key-change-in-production"
-JWT_EXPIRES_IN="7d"
-JWT_REFRESH_SECRET="your-super-secret-refresh-key-change-in-production"
-JWT_REFRESH_EXPIRES_IN="30d"
+# NextAuth.js v5
+NEXTAUTH_SECRET="your-nextauth-secret-min-32-chars-change-in-production"
+NEXTAUTH_URL="http://localhost:3000"
 
-# Server
+# App
+NEXT_PUBLIC_APP_NAME="SmartExpense Tracker"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 NODE_ENV="development"
-PORT=5000
-FRONTEND_URL="http://localhost:3000"
-
-# Rate Limiting
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
-LOGIN_RATE_LIMIT_MAX=5
-
-# File Upload (Cloudinary - optional)
-CLOUDINARY_CLOUD_NAME=""
-CLOUDINARY_API_KEY=""
-CLOUDINARY_API_SECRET=""
 
 # Email (for password reset)
 SMTP_HOST="smtp.gmail.com"
@@ -301,143 +368,189 @@ SMTP_PORT=587
 SMTP_USER=""
 SMTP_PASSWORD=""
 EMAIL_FROM="noreply@smartexpense.com"
+
+# File Upload (Cloudinary - optional)
+CLOUDINARY_CLOUD_NAME=""
+CLOUDINARY_API_KEY=""
+CLOUDINARY_API_SECRET=""
+
+# Sentry (optional)
+SENTRY_DSN=""
+NEXT_PUBLIC_SENTRY_DSN=""
 ---
 
-FILE: frontend/.env.example
+=== TASK 3: Drizzle ORM Setup ===
+
+Create FILE: drizzle.config.ts
 ---
-VITE_API_URL="http://localhost:5000/api"
-VITE_APP_NAME="SmartExpense Tracker"
+import type { Config } from 'drizzle-kit';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+export default {
+  schema: './src/lib/db/schema.ts',
+  out: './drizzle',
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DATABASE_URL!,
+  },
+  verbose: true,
+  strict: true,
+} satisfies Config;
 ---
 
-=== TASK 3: Database Schema (Prisma) ===
-
-Create FILE: backend/prisma/schema.prisma
+Create FILE: src/lib/db/index.ts
 ---
-generator client {
-  provider = "prisma-client-js"
-}
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+import * as schema from './schema';
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
 
-model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  passwordHash String    @map("password_hash")
-  name         String
-  currency     String    @default("USD")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+export const db = drizzle(pool, { schema });
+export type DB = typeof db;
+---
 
-  expenses     Expense[]
-  income       Income[]
-  categories   Category[]
-  budgets      Budget[]
-  recurring    RecurringExpense[]
+Create FILE: src/lib/db/schema.ts with complete Drizzle schema:
+---
+import {
+  pgTable, uuid, varchar, text, decimal,
+  boolean, date, timestamp, index, uniqueIndex
+} from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 
-  @@map("users")
-}
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  passwordHash: varchar('password_hash', { length: 255 }),
+  name: varchar('name', { length: 100 }).notNull(),
+  currency: varchar('currency', { length: 3 }).notNull().default('USD'),
+  resetToken: varchar('reset_token', { length: 255 }),
+  resetTokenExpiry: timestamp('reset_token_expiry'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
 
-model Expense {
-  id            String    @id @default(uuid())
-  userId        String    @map("user_id")
-  amount        Decimal   @db.Decimal(10, 2)
-  categoryId    String    @map("category_id")
-  description   String
-  date          DateTime  @db.Date
-  paymentMethod String    @default("card") @map("payment_method")
-  receiptUrl    String?   @map("receipt_url")
-  isRecurring   Boolean   @default(false) @map("is_recurring")
-  recurringId   String?   @map("recurring_id")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  deletedAt     DateTime? @map("deleted_at")
+export const categories = pgTable('categories', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 100 }).notNull(),
+  icon: varchar('icon', { length: 10 }).notNull(),
+  color: varchar('color', { length: 7 }).notNull(),
+  budgetLimit: decimal('budget_limit', { precision: 10, scale: 2 }),
+  isDefault: boolean('is_default').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  userNameIdx: uniqueIndex('categories_user_name_idx').on(table.userId, table.name),
+}));
 
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category      Category  @relation(fields: [categoryId], references: [id])
-  recurring     RecurringExpense? @relation(fields: [recurringId], references: [id])
+export const expenses = pgTable('expenses', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+  categoryId: uuid('category_id').notNull().references(() => categories.id),
+  description: text('description').notNull(),
+  date: date('date').notNull(),
+  paymentMethod: varchar('payment_method', { length: 10 }).notNull().default('card'),
+  receiptUrl: varchar('receipt_url', { length: 500 }),
+  isRecurring: boolean('is_recurring').notNull().default(false),
+  recurringId: uuid('recurring_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+}, (table) => ({
+  userDateIdx: index('expenses_user_date_idx').on(table.userId, table.date),
+  categoryIdx: index('expenses_category_idx').on(table.categoryId),
+  deletedIdx: index('expenses_deleted_idx').on(table.deletedAt),
+}));
 
-  @@index([userId, date(sort: Desc)])
-  @@index([categoryId])
-  @@map("expenses")
-}
+export const income = pgTable('income', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+  source: varchar('source', { length: 50 }).notNull(),
+  description: text('description'),
+  date: date('date').notNull(),
+  isRecurring: boolean('is_recurring').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+}, (table) => ({
+  userDateIdx: index('income_user_date_idx').on(table.userId, table.date),
+}));
 
-model Income {
-  id          String    @id @default(uuid())
-  userId      String    @map("user_id")
-  amount      Decimal   @db.Decimal(10, 2)
-  source      String
-  description String?
-  date        DateTime  @db.Date
-  isRecurring Boolean   @default(false) @map("is_recurring")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  deletedAt   DateTime? @map("deleted_at")
+export const budgets = pgTable('budgets', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  categoryId: uuid('category_id').notNull().references(() => categories.id),
+  amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+  period: varchar('period', { length: 10 }).notNull().default('monthly'),
+  startDate: date('start_date').notNull(),
+  endDate: date('end_date'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  userCategoryPeriodIdx: uniqueIndex('budgets_user_category_period_idx')
+    .on(table.userId, table.categoryId, table.period),
+}));
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+export const recurringExpenses = pgTable('recurring_expenses', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+  categoryId: uuid('category_id').notNull().references(() => categories.id),
+  description: text('description').notNull(),
+  frequency: varchar('frequency', { length: 10 }).notNull(),
+  nextOccurrence: date('next_occurrence').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
 
-  @@index([userId, date(sort: Desc)])
-  @@map("income")
-}
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  expenses: many(expenses),
+  income: many(income),
+  categories: many(categories),
+  budgets: many(budgets),
+  recurringExpenses: many(recurringExpenses),
+}));
 
-model Category {
-  id          String    @id @default(uuid())
-  userId      String?   @map("user_id")
-  name        String
-  icon        String
-  color       String
-  budgetLimit Decimal?  @db.Decimal(10, 2) @map("budget_limit")
-  isDefault   Boolean   @default(false) @map("is_default")
-  createdAt   DateTime  @default(now()) @map("created_at")
+export const expensesRelations = relations(expenses, ({ one }) => ({
+  user: one(users, { fields: [expenses.userId], references: [users.id] }),
+  category: one(categories, { fields: [expenses.categoryId], references: [categories.id] }),
+}));
 
-  user        User?     @relation(fields: [userId], references: [id])
-  expenses    Expense[]
-  budgets     Budget[]
-  recurring   RecurringExpense[]
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  user: one(users, { fields: [categories.userId], references: [users.id] }),
+  expenses: many(expenses),
+  budgets: many(budgets),
+}));
 
-  @@unique([userId, name])
-  @@map("categories")
-}
+export const budgetsRelations = relations(budgets, ({ one }) => ({
+  user: one(users, { fields: [budgets.userId], references: [users.id] }),
+  category: one(categories, { fields: [budgets.categoryId], references: [categories.id] }),
+}));
 
-model Budget {
-  id          String    @id @default(uuid())
-  userId      String    @map("user_id")
-  categoryId  String    @map("category_id")
-  amount      Decimal   @db.Decimal(10, 2)
-  period      String    @default("monthly")
-  startDate   DateTime  @db.Date @map("start_date")
-  endDate     DateTime? @db.Date @map("end_date")
-  createdAt   DateTime  @default(now()) @map("created_at")
-
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category    Category  @relation(fields: [categoryId], references: [id])
-
-  @@unique([userId, categoryId, period])
-  @@map("budgets")
-}
-
-model RecurringExpense {
-  id            String    @id @default(uuid())
-  userId        String    @map("user_id")
-  amount        Decimal   @db.Decimal(10, 2)
-  categoryId    String    @map("category_id")
-  description   String
-  frequency     String
-  nextOccurrence DateTime @db.Date @map("next_occurrence")
-  isActive      Boolean   @default(true) @map("is_active")
-  createdAt     DateTime  @default(now()) @map("created_at")
-
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category      Category  @relation(fields: [categoryId], references: [id])
-  expenses      Expense[]
-
-  @@map("recurring_expenses")
-}
+// TypeScript types inferred from schema
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Expense = typeof expenses.$inferSelect;
+export type NewExpense = typeof expenses.$inferInsert;
+export type Income = typeof income.$inferSelect;
+export type NewIncome = typeof income.$inferInsert;
+export type Category = typeof categories.$inferSelect;
+export type NewCategory = typeof categories.$inferInsert;
+export type Budget = typeof budgets.$inferSelect;
+export type NewBudget = typeof budgets.$inferInsert;
+export type RecurringExpense = typeof recurringExpenses.$inferSelect;
 ---
 
 === TASK 4: Database Seed File ===
 
-Create FILE: backend/prisma/seed.js with default categories:
+Create FILE: src/lib/db/seed.ts
+Default categories with TypeScript:
 - Food & Dining (🍔, #FF6B6B)
 - Transport (🚗, #4ECDC4)
 - Entertainment (🎬, #45B7D1)
@@ -449,11 +562,42 @@ Create FILE: backend/prisma/seed.js with default categories:
 - Personal Care (💅, #BB8FCE)
 - Other (📦, #AEB6BF)
 
-=== TASK 5: Docker Setup ===
+=== TASK 5: TypeScript Types ===
+
+Create FILE: src/types/index.ts
+Define all shared TypeScript interfaces:
+- ApiResponse<T>: { success: boolean, data: T, message: string }
+- ApiError: { success: false, message: string, errors?: ZodError[] }
+- PaginatedResponse<T>: { data: T[], pagination: Pagination }
+- Pagination: { page, limit, total, pages }
+- ExpenseWithCategory: Expense & { category: Category }
+- BudgetWithStatus: Budget & { spentAmount, remainingAmount, percentageUsed, status }
+- InsightType: 'pattern' | 'alert' | 'achievement' | 'suggestion' | 'projection'
+- InsightSeverity: 'info' | 'warning' | 'success' | 'danger'
+- Insight: { type, title, message, severity, icon, amount?, percentage? }
+
+=== TASK 6: Zod Validation Schemas ===
+
+Create FILE: src/lib/validations/expense.ts
+- createExpenseSchema: amount, categoryId, description, date, paymentMethod
+- updateExpenseSchema: all fields optional
+- expenseFiltersSchema: page, limit, startDate, endDate, categoryId, search, sortBy
+
+Create FILE: src/lib/validations/auth.ts
+- registerSchema: name, email, password (strong), confirmPassword
+- loginSchema: email, password
+- forgotPasswordSchema: email
+- resetPasswordSchema: token, password, confirmPassword
+
+Create FILE: src/lib/validations/budget.ts
+- createBudgetSchema: categoryId, amount, period
+- updateBudgetSchema: amount, period optional
+
+=== TASK 7: Docker Setup ===
 
 Using the DevOps Agent, create:
 
-FILE: docker-compose.yml
+Create FILE: docker-compose.yml
 ---
 version: '3.8'
 
@@ -466,7 +610,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: expense_tracker
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -490,139 +634,106 @@ volumes:
   postgres_data:
 ---
 
-FILE: Dockerfile (Backend)
+Note: PostgreSQL runs on port 5433 (not 5432) for the new stack.
+
+=== TASK 8: Next.js Configuration ===
+
+Update FILE: next.config.ts
+- Enable TypeScript strict checking
+- Configure image domains
+- Add security headers
+- Set up redirects (/ → /dashboard)
+- Bundle analyzer setup
+
+Create FILE: src/lib/utils/cn.ts
+- cn() utility using clsx + tailwind-merge
+  export function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs))
+  }
+
+=== TASK 9: Vitest Configuration ===
+
+Create FILE: vitest.config.ts
 ---
-FROM node:20-alpine AS base
-RUN apk add --no-cache dumb-init
-WORKDIR /app
-COPY package*.json ./
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
-FROM base AS dependencies
-RUN npm ci
-
-FROM base AS production
-RUN npm ci --only=production
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY . .
-RUN npx prisma generate
-
-ENV NODE_ENV=production
-ENV PORT=5000
-EXPOSE 5000
-
-RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
-USER nodejs
-
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "src/server.js"]
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    globals: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      thresholds: { global: { lines: 70, functions: 70 } }
+    }
+  },
+  resolve: {
+    alias: { '@': path.resolve(__dirname, './src') }
+  }
+});
 ---
 
-=== TASK 6: Backend Entry Point ===
+Create FILE: src/test/setup.ts
+- Import @testing-library/jest-dom
+- Mock next/navigation
+- Mock next-auth/react
 
-Create FILE: backend/src/server.js
-- Express app setup with all middleware
-- CORS configuration
-- Helmet for security headers
-- Morgan for logging
-- Rate limiting
-- Route mounting
-- Error handler
-- Prisma connection
-- Server startup with proper logging
+=== TASK 10: Package.json Scripts ===
 
-Create FILE: backend/src/config/env.js
-- Validate all required env vars on startup
-- Export organized config object
-- Throw clear errors for missing required vars
+Update FILE: package.json scripts:
+- "dev": "next dev --turbo"
+- "build": "next build"
+- "start": "next start"
+- "lint": "next lint"
+- "type-check": "tsc --noEmit"
+- "test": "vitest"
+- "test:ui": "vitest --ui"
+- "test:coverage": "vitest run --coverage"
+- "test:e2e": "playwright test"
+- "db:generate": "drizzle-kit generate:pg"
+- "db:push": "drizzle-kit push:pg"
+- "db:migrate": "drizzle-kit migrate"
+- "db:seed": "tsx src/lib/db/seed.ts"
+- "db:studio": "drizzle-kit studio"
+- "format": "prettier --write ."
 
-Create FILE: backend/src/utils/errors.js
-- AppError class (base)
-- ValidationError (400)
-- UnauthorizedError (401)
-- ForbiddenError (403)
-- NotFoundError (404)
-- ConflictError (409)
-
-Create FILE: backend/src/middleware/errorHandler.js
-- Global error handler middleware
-- Handle Prisma errors
-- Handle JWT errors
-- Handle validation errors
-- Different responses for dev vs production
-
-Create FILE: backend/src/middleware/asyncHandler.js
-- Wrapper to avoid try/catch in every controller
-
-=== TASK 7: Tailwind Configuration ===
-
-Update FILE: frontend/tailwind.config.js
-- Add custom colors for expense categories
-- Add custom fonts
-- Configure content paths for purging
-- Add expense-specific theme extensions
-
-=== TASK 8: Vite Configuration ===
-
-Update FILE: frontend/vite.config.js
-- Add path aliases (@/components, @/services, etc.)
-- Configure proxy for API calls to backend
-- Optimize build settings
-
-=== TASK 9: Package.json Scripts ===
-
-Update FILE: backend/package.json scripts:
-- "dev": "nodemon src/server.js"
-- "start": "node src/server.js"
-- "test": "jest --coverage"
-- "test:watch": "jest --watch"
-- "db:migrate": "prisma migrate dev"
-- "db:seed": "node prisma/seed.js"
-- "db:studio": "prisma studio"
-- "db:reset": "prisma migrate reset"
-- "lint": "eslint src/"
-- "format": "prettier --write src/"
-
-Update FILE: frontend/package.json scripts:
-- "dev": "vite"
-- "build": "vite build"
-- "preview": "vite preview"
-- "test": "jest"
-- "test:watch": "jest --watch"
-- "test:coverage": "jest --coverage"
-- "lint": "eslint src/"
-- "format": "prettier --write src/"
-
-=== TASK 10: README ===
+=== TASK 11: README ===
 
 Create FILE: README.md with:
 - Project overview and features
-- Tech stack
+- New tech stack table (Next.js 14 monolith)
 - Prerequisites
 - Step-by-step setup instructions
-- How to run development environment
-- How to run tests
-- API documentation link
-- Screenshots placeholder
-- Contributing guidelines
+- Development commands
+- Database setup with Drizzle
+- Testing instructions
+- Deployment to Vercel guide
 
 === VERIFICATION CHECKLIST ===
 After completing Phase 1, verify:
-[ ] Frontend runs: cd frontend && npm run dev (port 3000)
-[ ] Backend runs: cd backend && npm run dev (port 5000)
-[ ] PostgreSQL running in Docker: docker-compose up -d postgres
-[ ] Prisma connected: cd backend && npx prisma db push
+[ ] Next.js dev server runs: npm run dev (port 3000)
+[ ] TypeScript compiles: npm run type-check (zero errors)
+[ ] PostgreSQL in Docker on port 5433: docker-compose up -d postgres
+[ ] Drizzle schema pushed: npm run db:push
 [ ] Seed data applied: npm run db:seed
-[ ] .env files created from examples
+[ ] Drizzle Studio opens: npm run db:studio
+[ ] Shadcn/ui components installed in src/components/ui/
+[ ] .env file created from .env.example
 ```
 
 ---
 ## ✅ PHASE 1 EXPECTED OUTPUT
 ```
-Files Created: ~25 files
-Directories: ~30 folders
-Docker: PostgreSQL + Redis containers ready
-Database: Schema applied with 6 tables + seed data
-Both servers: Running without errors
+Files Created: ~20 files
+Directories: ~35 folders
+Docker: PostgreSQL (5433) + Redis containers ready
+Database: Schema applied with 6 tables + seed data (Drizzle)
+Dev server: http://localhost:3000 running without errors
+TypeScript: Zero type errors
 ```
 
 ---
@@ -635,7 +746,7 @@ Both servers: Running without errors
 > **Trigger:** Say `"Execute Phase 2"` in Claude Code
 > **Agent:** Web Development Agent (Primary)
 > **Duration:** Day 3-4
-> **Goal:** Complete JWT authentication with register, login, logout, password reset
+> **Goal:** NextAuth.js v5 with credentials, sessions, middleware, auth UI
 
 ---
 
@@ -645,244 +756,195 @@ Both servers: Running without errors
 EXECUTE PHASE 2: Authentication System
 AGENT: Web Development Agent
 
-=== BACKEND: Authentication API ===
+=== BACKEND: NextAuth.js v5 Setup ===
 
-TASK 1: Auth Routes
-Create FILE: backend/src/routes/auth.routes.js
-Endpoints:
-- POST /api/auth/register
-- POST /api/auth/login
-- POST /api/auth/logout
-- POST /api/auth/refresh-token
-- POST /api/auth/forgot-password
-- POST /api/auth/reset-password
-- GET  /api/auth/me (get current user)
+TASK 1: NextAuth Configuration
+Create FILE: src/lib/auth/auth.config.ts
+- Credentials provider configuration
+- Zod validation for login credentials
+- bcryptjs password comparison
+- Return user object on success
 
-TASK 2: Auth Controller
-Create FILE: backend/src/controllers/auth.controller.js
+Create FILE: src/lib/auth/auth.ts
+- NextAuth() configuration with DrizzleAdapter
+- JWT strategy (7 day sessions)
+- Session callback: include userId in session
+- JWT callback: include userId in token
+- signIn callback: validate user exists
+- Authorized callback for middleware
+- Export: auth, signIn, signOut, handlers
 
-register():
-- Validate: name (2-100 chars), email (valid format), password (min 8, uppercase, lowercase, number, special char)
-- Check if email already exists → throw ConflictError
-- Hash password with bcrypt (saltRounds: 12)
-- Create user in database
-- Generate JWT access token (7d) and refresh token (30d)
-- Return user data (exclude password) + tokens
-- Set refresh token in httpOnly cookie
+Create FILE: src/app/api/auth/[...nextauth]/route.ts
+- Export GET and POST from NextAuth handlers
 
-login():
-- Validate email and password
+TASK 2: NextAuth Middleware
+Create FILE: src/middleware.ts
+- Protect all (dashboard) routes
+- Redirect unauthenticated users to /login
+- Redirect authenticated users away from /login /register
+- Use NextAuth auth() in middleware
+- Configure matcher for protected paths
+
+TASK 3: Password & Auth Utilities
+Create FILE: src/lib/utils/password.ts
+- hashPassword(password: string): Promise<string>
+  bcryptjs hash with 12 rounds
+- comparePassword(password: string, hash: string): Promise<boolean>
+  bcryptjs compare
+- validatePasswordStrength(password: string): string[]
+  Returns array of error messages
+  Rules: min 8 chars, uppercase, lowercase, number, special char
+
+Create FILE: src/lib/utils/tokens.ts
+- generateResetToken(): string
+  crypto.randomBytes(32).toString('hex')
+- hashToken(token: string): string
+  crypto.createHash('sha256') hash
+- isTokenExpired(expiry: Date): boolean
+
+TASK 4: Auth API Routes
+Create FILE: src/app/api/auth/register/route.ts
+POST handler:
+- Parse body with registerSchema (Zod)
+- Check if email exists in DB (Drizzle)
+- Hash password (bcryptjs, 12 rounds)
+- Insert user into DB
+- Return: { success: true, message: "Account created" }
+- Errors: 409 if email exists, 400 if validation fails
+
+Create FILE: src/app/api/auth/forgot-password/route.ts
+POST handler:
+- Parse body with forgotPasswordSchema
 - Find user by email
-- Compare password with bcrypt
-- If invalid → throw UnauthorizedError (do NOT say which field is wrong - security)
-- Rate limit: max 5 attempts per 15 min
-- Generate new access + refresh tokens
-- Return user data + tokens
-- Set refresh token in httpOnly cookie
-
-logout():
-- Clear refresh token cookie
-- Return success message
-
-refreshToken():
-- Read refresh token from cookie
-- Verify refresh token JWT
-- Find user by ID from token
-- Generate new access token
-- Return new access token
-
-forgotPassword():
-- Find user by email
-- Generate password reset token (crypto.randomBytes)
-- Store hashed token + expiry (1 hour) in database
+- Generate reset token + hash it
+- Store hashed token + expiry (1hr) in DB (Drizzle update)
 - Send email with reset link
-- Always return same message (security - don't reveal if email exists)
+- Always return same success message (security)
 
-resetPassword():
-- Validate token and new password
-- Find user by hashed token (not expired)
+Create FILE: src/app/api/auth/reset-password/route.ts
+POST handler:
+- Parse body with resetPasswordSchema
+- Hash the provided token
+- Find user where resetToken matches + not expired
 - Hash new password
-- Update user
-- Clear reset token
+- Update user: new passwordHash, clear resetToken
 - Return success
 
-getMe():
-- Protected route (auth middleware required)
-- Return current user data (exclude password)
-
-TASK 3: Auth Middleware
-Create FILE: backend/src/middleware/auth.middleware.js
-
-authenticate():
-- Extract Bearer token from Authorization header
-- Verify JWT signature and expiry
-- Find user in database
-- Attach user to req.user
-- Handle: missing token, invalid token, expired token, user not found
-
-authorize(...roles):
-- Check if req.user.role is in allowed roles
-- For future role-based access
-
-TASK 4: Auth Validation
-Create FILE: backend/src/middleware/validation.middleware.js
-Using express-validator:
-- validateRegister: name, email, password strength rules
-- validateLogin: email, password required
-- validateForgotPassword: email required
-- validateResetPassword: token, password, confirmPassword match
-- checkValidation: middleware to handle validation errors
-
-TASK 5: Token Utilities
-Create FILE: backend/src/utils/jwt.js
-- generateAccessToken(userId): returns JWT (7d)
-- generateRefreshToken(userId): returns JWT (30d)
-- verifyAccessToken(token): returns decoded payload
-- verifyRefreshToken(token): returns decoded payload
-
-Create FILE: backend/src/utils/password.js
-- hashPassword(password): bcrypt hash
-- comparePassword(password, hash): bcrypt compare
-- validatePasswordStrength(password): returns errors array
-  Rules: min 8 chars, uppercase, lowercase, number, special char
+Create FILE: src/lib/utils/email.ts
+- sendPasswordResetEmail(email, token, name): Promise<void>
+  Uses nodemailer with SMTP config from env
+  HTML email template with reset link
 
 === FRONTEND: Authentication UI ===
 
-TASK 6: Auth Context
-Create FILE: frontend/src/context/AuthContext.jsx
-- user state
-- isAuthenticated
-- isLoading
-- login(email, password) function
-- register(name, email, password) function
-- logout() function
-- refreshToken() function
-- Persist auth state in localStorage
-- Auto-refresh token before expiry
-- Provider component
+TASK 5: Auth Layout
+Create FILE: src/app/(auth)/layout.tsx
+Server Component:
+- Check if user is already logged in → redirect to /dashboard
+- Centered layout with card
+- App branding (logo text + tagline)
+- No sidebar/navbar
 
-TASK 7: Auth Service
-Create FILE: frontend/src/services/auth.service.js
-- register(name, email, password): POST /api/auth/register
-- login(email, password): POST /api/auth/login
-- logout(): POST /api/auth/logout
-- refreshToken(): POST /api/auth/refresh-token
-- forgotPassword(email): POST /api/auth/forgot-password
-- resetPassword(token, password): POST /api/auth/reset-password
-- getMe(): GET /api/auth/me
+TASK 6: Register Page
+Create FILE: src/app/(auth)/register/page.tsx
+Server Component with metadata
 
-TASK 8: API Instance
-Create FILE: frontend/src/services/api.js
-- Create axios instance with base URL from env
-- Request interceptor: attach JWT token to all requests
-- Response interceptor: handle 401 → auto-refresh token → retry request
-- Handle refresh token failure → logout user
-- Standardize error format
-
-TASK 9: Login Component
-Create FILE: frontend/src/components/Auth/LoginForm.jsx
-- Email and password fields
-- Form validation (react-hook-form)
-- Show/hide password toggle
-- "Remember me" checkbox
-- Forgot password link
-- Submit button with loading state
-- Error display
-- Link to register
-- PropTypes validation
-- Full JSDoc comments
-
-Create FILE: frontend/src/components/Auth/LoginForm.test.jsx
-Tests:
-- Renders correctly
-- Validates required fields
-- Validates email format
-- Submits with correct data
-- Shows loading state
-- Displays error on failure
-- Navigates on success
-
-TASK 10: Register Component
-Create FILE: frontend/src/components/Auth/RegisterForm.jsx
-- Name, email, password, confirm password fields
-- Real-time password strength indicator
+Create FILE: src/components/auth/RegisterForm.tsx
+Client Component ('use client'):
+- React Hook Form + Zod (registerSchema)
+- Fields: name, email, password, confirmPassword
+- Real-time password strength indicator (4 rules)
 - Password match validation
-- Terms acceptance checkbox
-- Submit with loading state
-- Error display
-- Link to login
-- PropTypes validation
+- Submit: POST /api/auth/register → then signIn()
+- Loading state during submit
+- Error display with Shadcn Alert
+- Link to /login
+- TypeScript types for all props
 
-TASK 11: Forgot Password Component
-Create FILE: frontend/src/components/Auth/ForgotPasswordForm.jsx
-- Email field
-- Submit sends reset link
-- Success state (email sent message)
+TASK 7: Login Page
+Create FILE: src/app/(auth)/login/page.tsx
+Server Component with metadata
+
+Create FILE: src/components/auth/LoginForm.tsx
+Client Component ('use client'):
+- React Hook Form + Zod (loginSchema)
+- Fields: email, password
+- Show/hide password toggle (Shadcn Button + Eye icon)
+- Submit: NextAuth signIn('credentials', {...})
+- Handle: CredentialsSignin error → "Invalid email or password"
+- Loading state during submit
+- Error display
+- "Forgot password?" link
+- Link to /register
+- TypeScript strict types
+
+TASK 8: Forgot Password Page
+Create FILE: src/app/(auth)/forgot-password/page.tsx
+Create FILE: src/components/auth/ForgotPasswordForm.tsx
+Client Component:
+- Email field with Zod validation
+- POST /api/auth/forgot-password
+- Success state: "Check your email" message
 - Back to login link
 
-TASK 12: Reset Password Component
-Create FILE: frontend/src/components/Auth/ResetPasswordForm.jsx
-- New password + confirm password fields
+TASK 9: Reset Password Page
+Create FILE: src/app/(auth)/reset-password/page.tsx
+Create FILE: src/components/auth/ResetPasswordForm.tsx
+Client Component:
+- Get token from URL searchParams
+- New password + confirm password
 - Password strength indicator
-- Token validation (from URL params)
-- Success state → redirect to login
+- POST /api/auth/reset-password with token
+- Success: redirect to /login with toast
+- Invalid/expired token: error state
 
-TASK 13: Protected Route
-Create FILE: frontend/src/components/Common/ProtectedRoute.jsx
-- Check if user is authenticated
-- If not → redirect to /login
-- If yes → render children
-- Show loading spinner while checking auth
+TASK 10: Session Utilities
+Create FILE: src/lib/auth/session.ts
+Server-side session helpers:
+- getCurrentUser(): Promise<User | null>
+  Calls auth() and returns full user from DB
+- requireAuth(): Promise<User>
+  Throws redirect to /login if not authenticated
+  Use in Server Components and API routes
 
-TASK 14: Auth Pages
-Create FILE: frontend/src/pages/LoginPage.jsx
-Create FILE: frontend/src/pages/RegisterPage.jsx
-Create FILE: frontend/src/pages/ForgotPasswordPage.jsx
-Create FILE: frontend/src/pages/ResetPasswordPage.jsx
+TASK 11: Auth Tests
+Create FILE: src/test/auth/register.test.ts
+Vitest tests:
+- POST /api/auth/register: valid data creates user
+- POST /api/auth/register: duplicate email returns 409
+- POST /api/auth/register: weak password returns 400
+- POST /api/auth/register: missing fields returns 400
 
-Each page:
-- Centered layout with card
-- App logo/branding
-- Form component
-- Responsive design
-- Tailwind CSS styling
-
-TASK 15: App Router
-Update FILE: frontend/src/App.jsx
-- Setup React Router v6 routes
-- Public routes: /login, /register, /forgot-password, /reset-password
-- Protected routes: /dashboard, /expenses, /income, /budget, /analytics, /reports, /settings
-- Wrap protected routes with ProtectedRoute
-- Default redirect: / → /dashboard
-- 404 page
-
-TASK 16: Auth Tests (Backend)
-Create FILE: backend/src/__tests__/auth.test.js
-Integration tests using supertest:
-- POST /api/auth/register: success, duplicate email, invalid data
-- POST /api/auth/login: success, wrong password, wrong email
-- GET /api/auth/me: with valid token, without token, with invalid token
-- POST /api/auth/refresh-token: valid, expired, invalid
-- POST /api/auth/logout: success
+Create FILE: src/test/components/LoginForm.test.tsx
+Vitest + RTL:
+- Renders all fields
+- Validates email format
+- Validates required fields
+- Shows loading on submit
+- Displays error on failure
 
 === VERIFICATION CHECKLIST ===
-[ ] Register: creates user, returns token
-[ ] Login: returns token + user data
-[ ] Protected routes: reject without token
-[ ] Token refresh: works automatically
-[ ] Password reset: email sent (check console in dev)
-[ ] Frontend: register → login → dashboard flow works
-[ ] All auth tests pass: npm test (backend)
+[ ] Register: creates user in DB, redirects to dashboard
+[ ] Login: NextAuth session created, redirected to dashboard
+[ ] Protected routes: redirect to /login when not authenticated
+[ ] Authenticated routes (/login): redirect to /dashboard
+[ ] Forgot password: email sent (check console in dev)
+[ ] Reset password: password updated in DB
+[ ] session.ts: getCurrentUser() returns user data
+[ ] All auth tests pass: npm test
+[ ] TypeScript: npm run type-check (zero errors)
 ```
 
 ---
 ## ✅ PHASE 2 EXPECTED OUTPUT
 ```
-Files Created: ~20 files
-API Endpoints: 6 auth endpoints fully working
-Frontend: Login, Register, Forgot Password pages
-Security: Rate limiting, password hashing, JWT
-Tests: Auth integration tests passing
+Files Created: ~15 files
+API Routes: 4 auth routes + NextAuth handler
+Frontend: Login, Register, Forgot/Reset password pages
+Auth: NextAuth.js v5 sessions working
+Security: bcryptjs hashing, Zod validation, rate limiting
+Tests: Auth tests passing with Vitest
+TypeScript: Strict types on all auth files
 ```
 
 ---
@@ -890,12 +952,12 @@ Tests: Auth integration tests passing
 ---
 
 # ═══════════════════════════════════════
-# PHASE 3: EXPENSE MANAGEMENT (CORE)
+# PHASE 3: EXPENSE MANAGEMENT
 # ═══════════════════════════════════════
 > **Trigger:** Say `"Execute Phase 3"` in Claude Code
 > **Agent:** Web Development Agent (Primary)
 > **Duration:** Day 5-7
-> **Goal:** Complete expense CRUD, categories, filtering, pagination
+> **Goal:** Expense CRUD API routes, categories, filtering, pagination, CSV import
 
 ---
 
@@ -905,277 +967,234 @@ Tests: Auth integration tests passing
 EXECUTE PHASE 3: Expense Management System
 AGENT: Web Development Agent
 
-=== BACKEND: Expenses API ===
+=== BACKEND: API Route Handlers ===
 
-TASK 1: Category Routes & Controller
-Create FILE: backend/src/routes/category.routes.js
-Endpoints:
-- GET  /api/categories         (get all: system + user custom)
-- POST /api/categories         (create custom category)
-- PUT  /api/categories/:id     (update - only own categories)
-- DELETE /api/categories/:id   (delete - only own, not if has expenses)
-
-Create FILE: backend/src/controllers/category.controller.js
-getCategories():
-- Return system defaults (userId = null) + user's custom categories
+TASK 1: Categories API
+Create FILE: src/app/api/categories/route.ts
+GET handler:
+- Call requireAuth() for user session
+- Drizzle query: get system categories (userId IS NULL) + user categories
 - Include expense count per category
-- Include budget amount if budget exists
+- Return typed response
 
-createCategory():
-- Validate: name, icon, color required
-- Check duplicate name for this user
-- Create with userId from req.user.id
+POST handler:
+- requireAuth()
+- Validate body with createCategorySchema (Zod)
+- Check duplicate name for user (Drizzle)
+- Insert category
+- Return 201 with new category
 
-updateCategory():
-- Only allow updating own categories (not system defaults)
-- Validate ownership
-- Update name, icon, color, budgetLimit
+Create FILE: src/app/api/categories/[id]/route.ts
+PUT handler: validate ownership, update with Zod schema
+DELETE handler: check ownership, check if has expenses (count > 0), soft protect
 
-deleteCategory():
-- Only allow deleting own categories
-- Check if category has expenses → throw error with count
-- Soft protection: suggest migration
+TASK 2: Expenses API
+Create FILE: src/app/api/expenses/route.ts
+GET handler:
+- requireAuth()
+- Parse + validate query params with expenseFiltersSchema (Zod)
+- Drizzle query with:
+  - where: userId = current user, deletedAt IS NULL
+  - filters: date range, categoryId, paymentMethod, amount range, description search
+  - orderBy: configurable
+  - offset + limit for pagination
+  - join with categories
+- Return: { data, pagination, summary: { totalAmount, count } }
 
-TASK 2: Expense Routes & Controller
-Create FILE: backend/src/routes/expense.routes.js
-Endpoints:
-- GET    /api/expenses          (list with filters + pagination)
-- POST   /api/expenses          (create expense)
-- GET    /api/expenses/:id      (get single)
-- PUT    /api/expenses/:id      (update)
-- DELETE /api/expenses/:id      (delete - soft delete)
-- POST   /api/expenses/bulk     (bulk import from CSV)
-
-Create FILE: backend/src/controllers/expense.controller.js
-
-getExpenses():
-Query parameters:
-- page (default: 1)
-- limit (default: 20, max: 100)
-- startDate (ISO date)
-- endDate (ISO date)
-- categoryId (UUID)
-- paymentMethod (cash/card/bank)
-- minAmount (decimal)
-- maxAmount (decimal)
-- search (description search)
-- sortBy (date/amount/description, default: date)
-- sortOrder (asc/desc, default: desc)
-
-Response format:
-{
-  success: true,
-  data: expenses[],
-  pagination: { page, limit, total, pages },
-  summary: { totalAmount, count }
-}
-
-createExpense():
-- Validate: amount (positive number), categoryId (valid UUID, exists, belongs to user or system), description (max 500 chars), date (valid date, not future by more than 1 day), paymentMethod (cash/card/bank)
+POST handler:
+- requireAuth()
+- Validate with createExpenseSchema (Zod)
 - Verify category belongs to user or is system default
-- Create expense
-- If isRecurring → link to recurringId
+- Insert expense with Drizzle
+- Return 201 with expense + category
 
-getExpenseById():
-- Find expense by ID
-- Verify ownership (userId = req.user.id)
-- Include category details
+Create FILE: src/app/api/expenses/[id]/route.ts
+GET: requireAuth, find by id, verify ownership, return with category
+PUT: requireAuth, verify ownership, validate with Zod, update
+DELETE: requireAuth, verify ownership, soft delete (set deletedAt = NOW())
 
-updateExpense():
-- Find expense, verify ownership
-- Validate updated fields
-- Update expense
+Create FILE: src/app/api/expenses/bulk/route.ts
+POST handler:
+- requireAuth()
+- Accept multipart form data (CSV file)
+- Parse CSV: date, amount, description, category (match by name)
+- Validate each row with Zod
+- Batch insert valid rows
+- Return: { imported, failed, errors[] }
 
-deleteExpense():
-- Find expense, verify ownership
-- Soft delete: set deletedAt = NOW()
-- NOT a hard delete
-
-bulkImport():
-- Accept CSV file (multer)
-- Parse CSV: date, amount, description, category (name match)
-- Validate each row
-- Skip invalid rows (collect errors)
-- Insert valid rows in batch
-- Return: { imported: N, failed: M, errors: [] }
-
-TASK 3: Expense Validation
-Create FILE: backend/src/middleware/expense.validation.js
-- validateCreateExpense: all required fields
-- validateUpdateExpense: at least one field
-- validateBulkImport: file present, correct type
-
-TASK 4: CSV Parser Service
-Create FILE: backend/src/services/csvParser.service.js
-- parseExpenseCSV(filePath): reads CSV file
-- Expected columns: date, amount, description, category
-- Maps category names to category IDs
-- Returns array of valid expenses + array of errors
-- Sample CSV template generation
+TASK 3: Zod Schemas (update validations)
+Update FILE: src/lib/validations/expense.ts
+Add:
+- createCategorySchema: name, icon (emoji), color (#hex), budgetLimit?
+- updateCategorySchema: all optional
+- bulkImportRowSchema: date, amount, description, category
 
 === FRONTEND: Expense Management UI ===
 
-TASK 5: Expense Service
-Create FILE: frontend/src/services/expense.service.js
-- getExpenses(params): GET /api/expenses with query params
-- createExpense(data): POST /api/expenses
-- getExpense(id): GET /api/expenses/:id
-- updateExpense(id, data): PUT /api/expenses/:id
-- deleteExpense(id): DELETE /api/expenses/:id
-- bulkImport(csvFile): POST /api/expenses/bulk (FormData)
+TASK 4: TanStack Query Setup
+Create FILE: src/app/providers.tsx
+'use client' Provider component:
+- QueryClientProvider with QueryClient config
+- defaultOptions: staleTime 60s, retry 1
+- ReactQueryDevtools in development
 
-Create FILE: frontend/src/services/category.service.js
-- getCategories(): GET /api/categories
-- createCategory(data): POST /api/categories
-- updateCategory(id, data): PUT /api/categories/:id
-- deleteCategory(id): DELETE /api/categories/:id
+Update FILE: src/app/layout.tsx
+- Wrap children with Providers component
+- Keep as Server Component, Providers is Client Component
 
-TASK 6: Custom Hooks
-Create FILE: frontend/src/hooks/useExpenses.js
-- useExpenses(filters): fetch + paginate expenses
-- useExpense(id): fetch single expense
-- useCreateExpense(): mutation + invalidate query
-- useUpdateExpense(): mutation + invalidate query
-- useDeleteExpense(): mutation + confirmation
-- Use TanStack Query for caching
+Create FILE: src/lib/hooks/useExpenses.ts
+'use client' custom hooks:
+- useExpenses(filters): useQuery fetching /api/expenses
+- useExpense(id): useQuery for single expense
+- useCreateExpense(): useMutation + toast + invalidate
+- useUpdateExpense(): useMutation + toast + invalidate
+- useDeleteExpense(): useMutation + confirmation toast
+- All with proper TypeScript return types
 
-Create FILE: frontend/src/hooks/useCategories.js
-- useCategories(): fetch all categories
-- useCreateCategory(): mutation
-- useUpdateCategory(): mutation
-- useDeleteCategory(): mutation
+Create FILE: src/lib/hooks/useCategories.ts
+- useCategories(): useQuery
+- useCreateCategory(): useMutation
+- useUpdateCategory(): useMutation
+- useDeleteCategory(): useMutation
 
-TASK 7: ExpenseList Component
-Create FILE: frontend/src/components/Expenses/ExpenseList.jsx
-Features:
-- Table/list view of expenses
-- Columns: Date | Category Icon | Description | Amount | Payment Method | Actions
-- Pagination controls (prev/next + page numbers)
-- Loading skeleton while fetching
-- Empty state with illustration and "Add first expense" button
-- Responsive: table on desktop, cards on mobile
-- Row hover effects
+TASK 5: Expense List Component
+Create FILE: src/components/expenses/ExpenseList.tsx
+'use client' component:
+- Uses useExpenses() hook
+- Shadcn Table component
+- Columns: Date | Category | Description | Amount | Payment | Actions
 - Sort by clicking column headers
-- PropTypes validation
+- Loading: Shadcn Skeleton rows
+- Empty: EmptyState component
+- Responsive: scrollable table on mobile
+- TypeScript props interface
 
-TASK 8: ExpenseFilters Component
-Create FILE: frontend/src/components/Expenses/ExpenseFilters.jsx
-Filters:
-- Date range picker (start date, end date)
-- Category dropdown (multi-select)
-- Payment method (checkboxes: cash, card, bank)
-- Amount range (min, max)
-- Search input (description)
-- Clear all filters button
-- Active filter badges/chips
-- Collapsible on mobile
+TASK 6: Expense Filters Component
+Create FILE: src/components/expenses/ExpenseFilters.tsx
+'use client' component:
+- Shadcn Popover for date range (Calendar component)
+- Shadcn Select for category (multi)
+- Shadcn Input for amount min/max
+- Shadcn Input for search
+- Active filter badges (Shadcn Badge)
+- Clear all button
+- Controlled by URL search params (useSearchParams)
 
-TASK 9: ExpenseForm Component
-Create FILE: frontend/src/components/Expenses/ExpenseForm.jsx
-Fields:
-- Amount (number input with currency symbol)
-- Category (searchable dropdown with icons/colors)
-- Description (text input, required)
-- Date (date picker, default today)
-- Payment method (radio: cash/card/bank)
-- Is recurring toggle (shows frequency dropdown if yes)
-- Notes/additional info (optional textarea)
-- Submit + Cancel buttons
-- Form validation with react-hook-form
+TASK 7: Expense Form Component
+Create FILE: src/components/expenses/ExpenseForm.tsx
+'use client' component:
+- React Hook Form + Zod (createExpenseSchema)
+- Shadcn Form, FormField, FormItem, FormLabel, FormMessage
+- Fields:
+  - Amount: Shadcn Input with currency prefix
+  - Category: Shadcn Select with icons
+  - Description: Shadcn Input
+  - Date: Shadcn Calendar Popover
+  - Payment method: Shadcn RadioGroup
+  - Is Recurring: Shadcn Switch
+- Works for CREATE (no defaultValues) and EDIT (with defaultValues)
+- mode prop: 'create' | 'edit'
+- onSuccess callback
 - Loading state on submit
-- Error display per field
-- Works for both CREATE and EDIT (mode prop)
-- PropTypes validation
+- TypeScript strict props
 
-TASK 10: CategoryPicker Component
-Create FILE: frontend/src/components/Common/CategoryPicker.jsx
-- Searchable dropdown
-- Show category icon + color + name
-- Group: System defaults | My custom categories
-- Add new category option (opens modal)
-- Keyboard navigation
-- PropTypes validation
+TASK 8: Category Picker Component
+Create FILE: src/components/common/CategoryPicker.tsx
+'use client' component:
+- Shadcn Popover + Command (combobox pattern)
+- Search categories
+- Show icon + color dot + name
+- Group: System | Custom
+- "Add new" option → opens AddCategoryDialog
+- Controlled component with value/onChange props
 
-TASK 11: ExpenseCard Component
-Create FILE: frontend/src/components/Expenses/ExpenseCard.jsx
-Mobile card view:
-- Category color bar on left
-- Category icon + name
-- Description (truncated)
-- Amount (bold, right aligned)
-- Date + payment method (small text)
-- Edit + Delete actions (swipe or dots menu)
-- PropTypes validation
+TASK 9: Expense Page
+Create FILE: src/app/(dashboard)/expenses/page.tsx
+Server Component:
+- Metadata: title "Expenses"
+- Fetch initial data server-side (prefetch)
+- Render ExpensesPageClient
 
-TASK 12: DeleteConfirmation Component
-Create FILE: frontend/src/components/Common/DeleteConfirmation.jsx
-- Modal dialog
-- Warning icon
-- "Are you sure?" message
-- What will be deleted
-- Cancel and Confirm buttons
+Create FILE: src/components/expenses/ExpensesPageClient.tsx
+'use client' component:
+- PageHeader with "Add Expense" button
+- Summary cards: Month total, Count, Largest
+- ExpenseFilters
+- ExpenseList
+- Shadcn Dialog for ExpenseForm (add/edit)
+- Shadcn Dialog for delete confirmation
+- BulkImportDialog
+
+TASK 10: Common Reusable Components
+Create FILE: src/components/common/PageHeader.tsx
+- title, subtitle?, actions slot
+- TypeScript props
+
+Create FILE: src/components/common/SummaryCard.tsx
+- icon, title, value, trend? (up/down arrow + %)
+- Shadcn Card
+- Loading skeleton variant
+
+Create FILE: src/components/common/EmptyState.tsx
+- SVG illustration, title, description, action button?
+- Shadcn Button
+
+Create FILE: src/components/common/DeleteDialog.tsx
+- Shadcn AlertDialog
+- itemName prop for dynamic message
+- onConfirm async callback
 - Loading state on confirm
-- PropTypes validation
 
-TASK 13: BulkImportModal Component
-Create FILE: frontend/src/components/Expenses/BulkImportModal.jsx
-- File upload dropzone (drag & drop)
-- CSV format guide + download template link
-- Preview first 5 rows of uploaded CSV
-- Import progress bar
-- Results: X imported, Y failed
-- Error details for failed rows
-- PropTypes validation
+Create FILE: src/components/common/DataTable.tsx
+- Generic typed table component <T>
+- columns prop with header + accessorKey + cell renderer
+- Sortable headers
+- Loading skeleton
+- Empty state
+- TypeScript generics
 
-TASK 14: Expenses Page
-Create FILE: frontend/src/pages/ExpensesPage.jsx
-Layout:
-- Page header with title + "Add Expense" button
-- Summary cards: This month total, Count, Largest expense
-- Filters sidebar (collapsible on mobile)
-- ExpenseList (main content)
-- "Add Expense" floating button (mobile)
-- "Import CSV" button
-- Modal for add/edit form
+TASK 11: Expense Tests
+Create FILE: src/test/api/expenses.test.ts
+Vitest API tests:
+- GET /api/expenses: returns paginated list
+- POST /api/expenses: creates with valid data
+- POST /api/expenses: rejects without auth (401)
+- POST /api/expenses: validates amount > 0
+- DELETE /api/expenses/:id: soft deletes own expense
+- DELETE /api/expenses/:id: rejects other user's expense (403)
 
-TASK 15: Expense Tests (Frontend)
-Create FILE: frontend/src/components/Expenses/ExpenseForm.test.jsx
-Tests:
+Create FILE: src/test/components/ExpenseForm.test.tsx
+RTL tests:
 - Renders all fields
 - Validates required fields
 - Validates positive amount
-- Submits correct data on create
-- Populates fields on edit mode
-- Shows loading on submit
-
-Create FILE: backend/src/__tests__/expense.test.js
-Integration tests:
-- GET /api/expenses: list, filters, pagination
-- POST /api/expenses: create valid, create invalid
-- PUT /api/expenses/:id: update own, reject other's
-- DELETE /api/expenses/:id: soft delete own
-- Auth required for all routes
+- Submits correct data
+- Edit mode pre-populates values
 
 === VERIFICATION CHECKLIST ===
-[ ] Create expense → appears in list
-[ ] Edit expense → changes saved
-[ ] Delete expense → removed from list (soft)
-[ ] Filters work: date range, category, amount
-[ ] Pagination works
-[ ] CSV import works with sample file
-[ ] Category CRUD works
-[ ] Auth protection works
-[ ] All tests pass
+[ ] GET /api/expenses: paginated list with filters
+[ ] POST /api/expenses: creates and returns expense
+[ ] PUT /api/expenses/:id: updates only own expenses
+[ ] DELETE /api/expenses/:id: soft deletes
+[ ] Categories CRUD working
+[ ] Expense form: create and edit modes work
+[ ] Filters update URL params and refetch data
+[ ] CSV bulk import works with sample file
+[ ] TanStack Query caching working
+[ ] All tests pass: npm test
+[ ] TypeScript: npm run type-check (zero errors)
 ```
 
 ---
 ## ✅ PHASE 3 EXPECTED OUTPUT
 ```
-Files Created: ~25 files
-API Endpoints: 10 endpoints (categories + expenses)
+Files Created: ~20 files
+API Routes: 8 routes (categories + expenses)
 Frontend: Full expense management with CRUD
-Features: Filtering, pagination, CSV import, categories
-Tests: Frontend component + backend integration tests
+Features: Filtering via URL params, pagination, CSV import
+UI: Shadcn/ui components throughout
+Tests: Vitest passing
+TypeScript: Strict types on all files
 ```
 
 ---
@@ -1188,7 +1207,7 @@ Tests: Frontend component + backend integration tests
 > **Trigger:** Say `"Execute Phase 4"` in Claude Code
 > **Agent:** Web Development Agent (Primary)
 > **Duration:** Day 8-9
-> **Goal:** Income tracking, budget creation, recurring expenses, budget alerts
+> **Goal:** Income tracking, budgets, recurring expenses, alerts, full layout
 
 ---
 
@@ -1198,328 +1217,205 @@ Tests: Frontend component + backend integration tests
 EXECUTE PHASE 4: Income Tracking & Budget Management
 AGENT: Web Development Agent
 
-=== BACKEND: Income API ===
+=== BACKEND: Income API Routes ===
 
-TASK 1: Income Routes & Controller
-Create FILE: backend/src/routes/income.routes.js
-Endpoints:
-- GET    /api/income        (list with filters + pagination)
-- POST   /api/income        (create income entry)
-- GET    /api/income/:id    (get single)
-- PUT    /api/income/:id    (update)
-- DELETE /api/income/:id    (soft delete)
+TASK 1: Income API
+Create FILE: src/app/api/income/route.ts
+GET: requireAuth, Drizzle query with filters (source, date range, isRecurring), pagination
+POST: requireAuth, validate createIncomeSchema (Zod), insert
 
-Create FILE: backend/src/controllers/income.controller.js
-getIncome():
-- Filters: startDate, endDate, source, isRecurring
-- Pagination: page, limit
-- Summary: total for period
+Create FILE: src/app/api/income/[id]/route.ts
+GET, PUT, DELETE: requireAuth, ownership check, Drizzle operations
 
-createIncome():
-- Validate: amount (positive), source (salary/freelance/investment/other/rental/business), date, description (optional)
-- Create income record
+Zod schemas in src/lib/validations/income.ts:
+- createIncomeSchema: amount (positive), source (enum), description?, date, isRecurring
+- updateIncomeSchema: all optional
+- Income source enum: 'salary' | 'freelance' | 'investment' | 'rental' | 'business' | 'other'
 
-updateIncome(), deleteIncome(): same pattern as expenses
+=== BACKEND: Budget API Routes ===
 
-=== BACKEND: Budget API ===
+TASK 2: Budget API
+Create FILE: src/app/api/budgets/route.ts
+GET handler:
+- requireAuth()
+- Drizzle query: get all user budgets with category
+- For each budget calculate:
+  - spentAmount: sum of expenses in current period for that category
+  - remainingAmount: budgetAmount - spentAmount
+  - percentageUsed: (spentAmount / budgetAmount) * 100
+  - status: 'good' < 70%, 'warning' 70-99%, 'exceeded' >= 100%
+- Return typed BudgetWithStatus[]
 
-TASK 2: Budget Routes & Controller
-Create FILE: backend/src/routes/budget.routes.js
-Endpoints:
-- GET    /api/budgets         (get all budgets with current status)
-- POST   /api/budgets         (create budget)
-- PUT    /api/budgets/:id     (update budget)
-- DELETE /api/budgets/:id     (delete budget)
-- GET    /api/budgets/status  (get all budgets with spent amount + percentage)
-- GET    /api/budgets/alerts  (get budgets over 80% or exceeded)
+POST: requireAuth, validate createBudgetSchema, check no duplicate user+category+period, insert
 
-Create FILE: backend/src/controllers/budget.controller.js
+Create FILE: src/app/api/budgets/[id]/route.ts
+PUT, DELETE: requireAuth, ownership check, update/delete
 
-getBudgets():
-- Return all budgets for user
-- Include category details
-- Include spent amount for current period
-- Calculate percentage used
+Create FILE: src/app/api/budgets/status/route.ts
+GET: requireAuth, return all budgets with status sorted by percentageUsed DESC
 
-getBudgetStatus():
-- For each budget, calculate:
-  - budgetAmount: the limit set
-  - spentAmount: actual expenses in period
-  - remainingAmount: budget - spent
-  - percentageUsed: (spent/budget) * 100
-  - status: 'good' (< 70%), 'warning' (70-99%), 'exceeded' (>= 100%)
-- Sort by percentageUsed DESC
+Create FILE: src/app/api/budgets/alerts/route.ts
+GET: requireAuth, return budgets where percentageUsed >= 80%, grouped by warning/exceeded
 
-getBudgetAlerts():
-- Return budgets where percentageUsed >= 80%
-- Group by: warning (80-99%), exceeded (100%+)
+=== BACKEND: Recurring Expenses ===
 
-createBudget():
-- Validate: categoryId, amount (positive), period (monthly/yearly)
-- Check: no duplicate budget for same user+category+period
-- Set startDate to start of current period
+TASK 3: Recurring API
+Create FILE: src/app/api/recurring/route.ts
+GET, POST: list and create recurring expense templates
 
-updateBudget():
-- Update amount, period
-- Recalculate status
+Create FILE: src/app/api/recurring/[id]/route.ts
+PUT, DELETE: update or deactivate templates
 
-=== BACKEND: Recurring Expenses API ===
+Create FILE: src/app/api/recurring/process/route.ts
+POST: find all active recurring where nextOccurrence <= today, create expenses, update nextOccurrence
 
-TASK 3: Recurring Expense Routes & Controller
-Create FILE: backend/src/routes/recurring.routes.js
-Endpoints:
-- GET    /api/recurring        (list recurring templates)
-- POST   /api/recurring        (create recurring template)
-- PUT    /api/recurring/:id    (update template)
-- DELETE /api/recurring/:id    (deactivate - not hard delete)
-- POST   /api/recurring/process (process due recurring expenses - cron)
-
-Create FILE: backend/src/controllers/recurring.controller.js
-
-getRecurring():
-- List all active recurring expenses
-- Include next occurrence date
-- Include category details
-
-createRecurring():
-- Validate: amount, categoryId, description, frequency (daily/weekly/monthly/yearly), startDate
-- Calculate next occurrence
-- Create template
-
-processRecurring():
-- Find all active recurring expenses where nextOccurrence <= TODAY
-- Create actual expense records
-- Update nextOccurrence based on frequency
-- Return count of processed
-
-Create FILE: backend/src/services/recurring.service.js
-- calculateNextOccurrence(date, frequency): returns next date
-- processAllDueRecurring(): runs all due expenses
-- scheduleRecurring(): set up simple interval (no cron needed for now)
+Create FILE: src/lib/utils/recurring.ts
+- calculateNextOccurrence(date: Date, frequency: string): Date
+- processAllDueRecurring(userId: string): Promise<number>
 
 === FRONTEND: Income UI ===
 
-TASK 4: Income Service & Hooks
-Create FILE: frontend/src/services/income.service.js
-- getIncome(params)
-- createIncome(data)
-- updateIncome(id, data)
-- deleteIncome(id)
-
-Create FILE: frontend/src/hooks/useIncome.js
-- useIncome(filters): with TanStack Query
-- useCreateIncome(): mutation
-- useUpdateIncome(): mutation
-- useDeleteIncome(): mutation
+TASK 4: Income Hooks
+Create FILE: src/lib/hooks/useIncome.ts
+- useIncome(filters), useCreateIncome, useUpdateIncome, useDeleteIncome
+- TanStack Query with proper TypeScript types
 
 TASK 5: Income Components
-Create FILE: frontend/src/components/Income/IncomeForm.jsx
-Fields:
-- Amount (number input)
-- Source (dropdown: Salary, Freelance, Investment, Rental, Business, Other)
-- Description (optional text)
-- Date (date picker)
-- Is recurring toggle
-- Frequency if recurring
-- PropTypes validation
+Create FILE: src/components/income/IncomeForm.tsx
+'use client':
+- React Hook Form + Zod
+- Shadcn Form fields: amount, source (Select), description (optional), date, isRecurring (Switch)
+- TypeScript props with mode: 'create' | 'edit'
 
-Create FILE: frontend/src/components/Income/IncomeList.jsx
-- Table with: Date | Source | Description | Amount | Actions
-- Monthly total at top
-- Year-to-date total
-- Pagination
-- Loading skeleton
-- Empty state
-- PropTypes validation
+Create FILE: src/components/income/IncomeList.tsx
+'use client':
+- Shadcn Table
+- Columns: Date | Source badge | Description | Amount | Actions
+- Source displayed as Shadcn Badge with color per source type
+- Loading + empty states
 
-Create FILE: frontend/src/components/Income/IncomeSummary.jsx
-Summary cards:
-- This month total
-- Last month total
-- Year-to-date total
-- Average monthly income
-- PropTypes validation
+Create FILE: src/components/income/IncomeSummary.tsx
+Server Component:
+- Fetch income totals server-side
+- This month | Last month | YTD | Average monthly
+- SummaryCard components
 
 TASK 6: Income Page
-Create FILE: frontend/src/pages/IncomePage.jsx
-- Page header + "Add Income" button
-- IncomeSummary cards
-- IncomeList with filters
-- Add/Edit modal
+Create FILE: src/app/(dashboard)/income/page.tsx
+Server Component + metadata
+Create FILE: src/components/income/IncomePageClient.tsx
+'use client': header, IncomeSummary, IncomeList, add/edit Dialog
 
 === FRONTEND: Budget UI ===
 
-TASK 7: Budget Service & Hooks
-Create FILE: frontend/src/services/budget.service.js
-- getBudgets()
-- getBudgetStatus()
-- getBudgetAlerts()
-- createBudget(data)
-- updateBudget(id, data)
-- deleteBudget(id)
+TASK 7: Budget Hooks
+Create FILE: src/lib/hooks/useBudgets.ts
+- useBudgets(), useBudgetStatus(), useBudgetAlerts()
+- useCreateBudget(), useUpdateBudget(), useDeleteBudget()
+- Proper TypeScript with BudgetWithStatus type
 
-Create FILE: frontend/src/hooks/useBudgets.js
-- useBudgets(): fetch all
-- useBudgetStatus(): fetch with spending data
-- useBudgetAlerts(): fetch alerts only
-
-TASK 8: BudgetCard Component
-Create FILE: frontend/src/components/Budget/BudgetCard.jsx
-Display:
+TASK 8: Budget Components
+Create FILE: src/components/budget/BudgetCard.tsx
+'use client':
+- Shadcn Card
 - Category icon + color + name
-- Budget amount vs spent amount
-- Progress bar (color: green < 70%, yellow 70-99%, red >= 100%)
-- Remaining amount
-- Days left in period
-- Edit + Delete actions
-- Alert badge if exceeded
-- PropTypes validation
+- Shadcn Progress bar (colored: green/yellow/red based on %)
+- Amount: $spent / $budget
+- Remaining amount + days left
+- Edit + Delete actions (Shadcn DropdownMenu)
+- Alert badge if exceeded (Shadcn Badge variant="destructive")
+- TypeScript props
 
-TASK 9: BudgetProgressBar Component
-Create FILE: frontend/src/components/Budget/BudgetProgressBar.jsx
-- Animated progress bar
-- Color changes based on percentage
-- Shows percentage label
-- Tooltip with exact amounts
-- PropTypes validation
+Create FILE: src/components/budget/BudgetForm.tsx
+'use client':
+- React Hook Form + Zod
+- Shadcn: CategoryPicker, Input (amount), Select (period: monthly/yearly)
+- Shows only categories without existing budget
 
-TASK 10: BudgetForm Component
-Create FILE: frontend/src/components/Budget/BudgetForm.jsx
-Fields:
-- Category picker (only categories without existing budget)
-- Budget amount (with monthly/yearly toggle)
-- Period selector (monthly/yearly)
-- Optional: custom start date
-- PropTypes validation
+Create FILE: src/components/budget/BudgetAlerts.tsx
+'use client':
+- Shadcn Alert component (variant="destructive" for exceeded)
+- Uses useBudgetAlerts() hook
+- Dismissed with Shadcn Button
+- Shows exceeded first, then warnings
 
-TASK 11: BudgetAlerts Component
-Create FILE: frontend/src/components/Budget/BudgetAlerts.jsx
-- Alert banner at top of budget page
-- List of exceeded budgets
-- List of warning budgets (>80%)
-- Dismiss individual alerts
-- Quick link to adjust budget
-- PropTypes validation
-
-TASK 12: Budget Page
-Create FILE: frontend/src/pages/BudgetPage.jsx
-Layout:
-- BudgetAlerts (if any)
+TASK 9: Budget Page
+Create FILE: src/app/(dashboard)/budget/page.tsx
+Server Component + metadata
+Create FILE: src/components/budget/BudgetPageClient.tsx
+'use client':
+- BudgetAlerts at top (if any)
 - Summary: Total budgeted | Total spent | On track | Over budget
-- Budget cards grid (2 columns desktop, 1 mobile)
-- "Add Budget" button
-- Empty state with guide
+- Grid of BudgetCards (2 col desktop, 1 col mobile)
+- Add Budget Dialog with BudgetForm
 
-TASK 13: Recurring Expenses Page
-Create FILE: frontend/src/pages/RecurringPage.jsx
-- List of recurring expense templates
-- Show: amount, category, frequency, next date, status (active/inactive)
-- Toggle active/inactive
-- Edit and delete
-- "Add Recurring" button
+=== FRONTEND: App Layout ===
 
-=== FRONTEND: Common Components ===
+TASK 10: Dashboard Layout (Critical)
+Create FILE: src/app/(dashboard)/layout.tsx
+Server Component:
+- requireAuth() → redirect to /login if not authenticated
+- Render Layout component with children
 
-TASK 14: Common Components
+Create FILE: src/components/common/Layout.tsx
+'use client':
+- Sidebar (desktop) + mobile drawer (Shadcn Sheet)
+- Top Navbar
+- Children in main content area
 
-Create FILE: frontend/src/components/Common/PageHeader.jsx
-- Title
-- Subtitle (optional)
-- Action buttons slot
-- Breadcrumb (optional)
-- PropTypes validation
+Create FILE: src/components/common/Sidebar.tsx
+'use client':
+- Navigation links with lucide-react icons:
+  LayoutDashboard | Receipt | TrendingUp | PiggyBank | BarChart3 | FileText | Settings
+- Active route highlighting (usePathname)
+- Shadcn Button variant="ghost" for nav items
+- User name + email at bottom
+- Sign out button (NextAuth signOut)
+- Collapsible on small desktop (icon only)
 
-Create FILE: frontend/src/components/Common/SummaryCard.jsx
-- Icon + color
-- Title
-- Value (large font)
-- Subtitle/comparison (optional, with up/down arrow)
-- Loading skeleton state
-- PropTypes validation
-
-Create FILE: frontend/src/components/Common/DataTable.jsx
-- Headers with sort arrows
-- Rows with hover
-- Loading skeleton rows
-- Empty state
-- Responsive (horizontal scroll on mobile)
-- PropTypes validation
-
-Create FILE: frontend/src/components/Common/Pagination.jsx
-- Previous + Next buttons
-- Page numbers (show 5 max)
-- Items per page selector
-- Total count display
-- PropTypes validation
-
-Create FILE: frontend/src/components/Common/Modal.jsx
-- Overlay + centered card
-- Header with title + close button
-- Body slot
-- Footer slot
-- Click outside to close
-- Escape key to close
-- Trap focus inside
-- PropTypes validation
-
-Create FILE: frontend/src/components/Common/LoadingSkeleton.jsx
-- Multiple skeleton variants: text, card, table-row, chart
-- Animated shimmer effect
-- PropTypes validation
-
-Create FILE: frontend/src/components/Common/EmptyState.jsx
-- Illustration (simple SVG)
-- Title
-- Description
-- Action button (optional)
-- PropTypes validation
-
-TASK 15: Layout Component
-Create FILE: frontend/src/components/Common/Layout.jsx
-- Sidebar navigation (desktop)
-- Top navigation bar
-- Mobile hamburger menu
-- Navigation items:
-  Dashboard | Expenses | Income | Budget | Analytics | Reports | Settings
-- User avatar + name in sidebar bottom
-- Logout button
-- Active route highlighting
-- PropTypes validation
-
-Create FILE: frontend/src/components/Common/Sidebar.jsx
-- Navigation links with icons (lucide-react)
-- Active state styling
-- Collapsed state (icon only) on small desktop
-- PropTypes validation
-
-Create FILE: frontend/src/components/Common/Navbar.jsx
+Create FILE: src/components/common/Navbar.tsx
+'use client':
 - App name/logo
-- Page title (from current route)
-- Budget alerts badge (if any)
-- User menu dropdown (profile, settings, logout)
-- Mobile menu button
-- PropTypes validation
+- Current page title
+- Budget alerts bell icon (Shadcn Badge count)
+- Shadcn DropdownMenu: avatar, profile link, settings, sign out
+- Mobile hamburger (triggers Sidebar Sheet)
+- useSession() for user info
+
+=== FRONTEND: Recurring UI ===
+
+TASK 11: Recurring Page
+Create FILE: src/app/(dashboard)/recurring/page.tsx
+Server Component + metadata
+Create FILE: src/components/recurring/RecurringPageClient.tsx
+'use client':
+- List templates: amount, category, frequency, next date
+- Shadcn Switch for active/inactive toggle
+- Edit + Delete actions
+- Add Recurring Dialog
 
 === VERIFICATION CHECKLIST ===
-[ ] Add income → appears in list + total updates
+[ ] Add income → list updates, totals recalculate
 [ ] Create budget → shows with progress bar
-[ ] Spend near budget → progress bar turns yellow
-[ ] Exceed budget → alert appears, bar turns red
-[ ] Recurring expense → template created
-[ ] Process recurring → expense auto-created
-[ ] Layout: sidebar navigation works
-[ ] All pages accessible and navigable
-[ ] Responsive layout on mobile
+[ ] Spend near limit → bar turns yellow (>70%)
+[ ] Exceed budget → alert appears, bar turns red (>100%)
+[ ] Layout: sidebar navigation fully works
+[ ] Protected routes redirect to login
+[ ] All pages accessible and styled correctly
+[ ] Mobile: Sidebar opens as Sheet drawer
+[ ] Recurring templates process correctly
+[ ] TypeScript: npm run type-check (zero errors)
 ```
 
 ---
 ## ✅ PHASE 4 EXPECTED OUTPUT
 ```
-Files Created: ~30 files
-API Endpoints: 15+ endpoints (income, budget, recurring)
+Files Created: ~25 files
+API Routes: 12 routes (income, budget, recurring)
 Frontend: Income, Budget, Recurring pages
-Features: Budget tracking, alerts, progress bars, recurring
-Components: Complete UI component library
+Layout: Complete sidebar + navbar navigation
+Features: Budget tracking, alerts, progress bars
+TypeScript: Strict types on all files
 ```
 
 ---
@@ -1532,7 +1428,7 @@ Components: Complete UI component library
 > **Trigger:** Say `"Execute Phase 5"` in Claude Code
 > **Agent:** Data Analysis Agent (Primary) + Web Development Agent (Secondary)
 > **Duration:** Day 10-12
-> **Goal:** Dashboard, charts, analytics, AI-powered insights
+> **Goal:** Dashboard, Recharts, Server Components data fetching, AI insights
 
 ---
 
@@ -1542,268 +1438,220 @@ Components: Complete UI component library
 EXECUTE PHASE 5: Analytics, Charts & Dashboard
 AGENTS: Data Analysis Agent (Primary) + Web Development Agent (Secondary)
 
-=== BACKEND: Analytics API ===
+=== BACKEND: Analytics API Routes ===
 
-TASK 1: Analytics Routes
-Create FILE: backend/src/routes/analytics.routes.js
-Endpoints:
-- GET /api/analytics/summary           (monthly overview)
-- GET /api/analytics/trends            (spending over time)
-- GET /api/analytics/category-breakdown (by category)
-- GET /api/analytics/insights          (smart pattern insights)
-- GET /api/analytics/comparison        (this month vs last month)
-- GET /api/analytics/income-vs-expense (income vs expense over time)
+TASK 1: Analytics API
+Create FILE: src/app/api/analytics/route.ts
+Handles multiple analytics endpoints via searchParams:
+- ?type=summary&month=2024-01
+- ?type=trends&period=6months
+- ?type=category-breakdown&month=2024-01
+- ?type=insights
+- ?type=comparison
+- ?type=income-vs-expense
 
-TASK 2: Analytics Controller
-Create FILE: backend/src/controllers/analytics.controller.js
+Create FILE: src/lib/utils/analytics.ts
+TypeScript analytics engine:
 
-getSummary():
-Query: ?month=2024-01 (default: current month)
-Return:
-{
-  period: { start, end },
-  totalExpenses: decimal,
-  totalIncome: decimal,
-  netSavings: decimal,
-  savingsRate: percentage,
-  expenseCount: number,
-  topCategory: { name, amount, percentage },
-  budgetStatus: { onTrack, warning, exceeded },
-  vsLastMonth: {
-    expenseChange: percentage,
-    incomeChange: percentage
-  }
+interface MonthlySummary {
+  period: { start: string; end: string; label: string };
+  totalExpenses: number;
+  totalIncome: number;
+  netSavings: number;
+  savingsRate: number;
+  expenseCount: number;
+  topCategory: { name: string; amount: number; percentage: number };
+  vsLastMonth: { expenseChange: number; incomeChange: number };
 }
 
-getTrends():
-Query: ?period=6months or ?period=12months or ?startDate=&endDate=
-Return: Array of { month, totalExpenses, totalIncome, netSavings }
-
-getCategoryBreakdown():
-Query: ?month=2024-01
-Return: Array of {
-  categoryId, categoryName, categoryColor, categoryIcon,
-  amount, percentage, transactionCount,
-  budgetAmount (if exists), budgetPercentageUsed
+interface TrendDataPoint {
+  month: string;
+  totalExpenses: number;
+  totalIncome: number;
+  netSavings: number;
 }
 
-getInsights():
-Using Data Analysis Agent logic, generate rule-based insights:
-
-Rule 1: Weekend vs Weekday Spending
-- Calculate avg daily spending: weekends vs weekdays
-- If weekends > weekdays * 1.3 → "You spend X% more on weekends"
-
-Rule 2: Category Month-over-Month
-- Compare each category: this month vs last month
-- If increase > $20 and > 20% → "Your [category] spending increased by $X"
-- If decrease > $20 → "Great! You reduced [category] spending by $X"
-
-Rule 3: Budget Performance
-- Find categories exceeding budget → "You've exceeded your [category] budget by $X"
-- Find categories well under budget → "You're saving well on [category]"
-
-Rule 4: Savings Rate
-- Calculate: (income - expenses) / income * 100
-- < 0% → "You're spending more than you earn this month"
-- 0-10% → "Try to save at least 20% of income"
-- 10-20% → "Good savings rate! Try to reach 20%"
-- > 20% → "Excellent! You're saving X% of your income"
-
-Rule 5: Unusual Expenses
-- Find expenses > 2x the average for that category → "Unusual expense detected in [category]"
-
-Rule 6: Recurring Cost Reminder
-- List active recurring expenses with next occurrence this week
-
-Rule 7: Month Projection
-- Based on spending in first N days → project full month spending
-- "At this rate, you'll spend $X this month (X% of income)"
-
-Return array of insight objects:
-{
-  type: 'pattern'|'alert'|'achievement'|'suggestion'|'projection',
-  title: string,
-  message: string,
-  severity: 'info'|'warning'|'success'|'danger',
-  icon: string,
-  amount: decimal (optional),
-  percentage: decimal (optional)
+interface CategoryBreakdown {
+  categoryId: string;
+  categoryName: string;
+  categoryColor: string;
+  categoryIcon: string;
+  amount: number;
+  percentage: number;
+  transactionCount: number;
+  budgetAmount?: number;
+  budgetPercentage?: number;
 }
 
-getComparison():
-Return side-by-side: this month vs last month
-By category: amount this month, amount last month, change
+interface Insight {
+  type: 'pattern' | 'alert' | 'achievement' | 'suggestion' | 'projection';
+  title: string;
+  message: string;
+  severity: 'info' | 'warning' | 'success' | 'danger';
+  icon: string;
+  amount?: number;
+  percentage?: number;
+}
 
-getIncomeVsExpense():
-Last 12 months bar chart data
+Implement rule-based insights engine:
+Rule 1: Weekend vs weekday spending comparison
+Rule 2: Category month-over-month change (flag if > $20 and > 20%)
+Rule 3: Budget performance (exceeded, under budget)
+Rule 4: Savings rate classification (poor/ok/good/excellent)
+Rule 5: Unusual expenses (> 2x category average)
+Rule 6: Recurring expenses due this week
+Rule 7: Month spending projection based on first N days
 
-TASK 3: Analytics Service
-Create FILE: backend/src/services/analytics.service.js
-- getMonthExpenses(userId, year, month): helper
-- getMonthIncome(userId, year, month): helper
-- groupByCategory(expenses): helper
-- groupByDay(expenses): helper
-- groupByWeek(expenses): helper
-- calculateTrends(months): helper
-- generateInsights(userId, month): rule engine
+=== FRONTEND: Dashboard ===
 
-=== FRONTEND: Analytics UI ===
+TASK 2: Dashboard Page (Server Component)
+Create FILE: src/app/(dashboard)/dashboard/page.tsx
+Server Component (fetch data server-side):
+- requireAuth()
+- Parallel data fetching with Promise.all():
+  - getMonthlySummary(userId, currentMonth)
+  - getCategoryBreakdown(userId, currentMonth)
+  - getTrends(userId, '6months')
+  - getInsights(userId)
+  - getRecentExpenses(userId, 10)
+  - getBudgetAlerts(userId)
+- Pass all data as props to DashboardClient
+- Metadata: title "Dashboard"
 
-TASK 4: Analytics Service
-Create FILE: frontend/src/services/analytics.service.js
-- getSummary(month)
-- getTrends(period)
-- getCategoryBreakdown(month)
-- getInsights()
-- getComparison()
-- getIncomeVsExpense()
+TASK 3: Dashboard Client Component
+Create FILE: src/components/dashboard/DashboardClient.tsx
+'use client':
+- Month selector (prev/next) using useRouter for URL params
+- Re-fetches when month changes
+- Renders all dashboard sections
+- TypeScript props for all pre-fetched data
 
-Create FILE: frontend/src/hooks/useAnalytics.js
-- useSummary(month)
-- useTrends(period)
-- useCategoryBreakdown(month)
-- useInsights()
-- useComparison()
-
-TASK 5: Dashboard Page
-Create FILE: frontend/src/pages/DashboardPage.jsx
-Layout (top to bottom):
-1. Welcome header with current date
-2. Month selector (prev/next month)
-3. Summary cards row (4 cards)
-4. Budget alerts (if any)
-5. Charts row: Pie chart (left) + Line chart (right)
-6. AI Insights cards
-7. Recent transactions table (last 10)
-8. Quick action buttons
-
-TASK 6: Summary Cards
-Create FILE: frontend/src/components/Dashboard/SummaryCards.jsx
-4 cards:
-- Total Expenses: amount + vs last month arrow
-- Total Income: amount + vs last month arrow
+TASK 4: Summary Cards
+Create FILE: src/components/dashboard/SummaryCards.tsx
+'use client':
+- 4 Shadcn Cards in a grid (2x2 mobile, 4x1 desktop)
+- Total Expenses: amount + trend arrow vs last month
+- Total Income: amount + trend arrow
 - Net Savings: amount + positive/negative color
-- Savings Rate: percentage + progress circle
-- Loading skeleton state
-- PropTypes validation
+- Savings Rate: percentage + Shadcn Progress (circular look)
+- Trend: green arrow up (good for income/savings), red arrow (bad for expenses)
+- TypeScript props: MonthlySummary type
 
-TASK 7: Pie Chart Component
-Create FILE: frontend/src/components/Charts/ExpensePieChart.jsx
-Using Recharts PieChart:
-- Category breakdown as donut chart
-- Custom legend with amounts + percentages
-- Hover tooltip with details
-- Click to filter (optional)
-- Total in center
-- Animate on load
+TASK 5: Pie Chart Component
+Create FILE: src/components/analytics/ExpensePieChart.tsx
+'use client' (charts must be client):
+- Recharts ResponsiveContainer + PieChart
+- Donut style (innerRadius=60, outerRadius=100)
+- Custom legend below: color dot + name + amount + %
+- Custom tooltip showing amount + percentage
+- Total amount in center of donut
+- Animate on mount (isAnimationActive)
+- Empty state: "No expenses this month"
+- TypeScript props: CategoryBreakdown[]
+
+TASK 6: Line Chart Component
+Create FILE: src/components/analytics/SpendingTrendChart.tsx
+'use client':
+- Recharts ResponsiveContainer + LineChart
+- 3 lines: Expenses (red), Income (green), Savings (blue)
+- X axis: month abbreviations
+- Y axis: currency format
+- Custom tooltip showing all 3 values
+- Period selector tabs: 3M | 6M | 12M (Shadcn Tabs)
+- On tab change: fetch new data via TanStack Query
+- TypeScript props: TrendDataPoint[]
+
+TASK 7: Bar Chart Component
+Create FILE: src/components/analytics/MonthlyComparisonChart.tsx
+'use client':
+- Recharts BarChart grouped bars
+- This month vs Last month per category
+- Tooltip showing both values + difference
 - Responsive container
-- Empty state
-- PropTypes validation
+- TypeScript props
 
-TASK 8: Line Chart Component
-Create FILE: frontend/src/components/Charts/SpendingTrendChart.jsx
-Using Recharts LineChart:
-- Multiple lines: Expenses + Income + Savings
-- X axis: months
-- Y axis: currency amounts
-- Tooltip with all values
-- Legend
-- Period selector: 3M / 6M / 12M
-- Responsive container
-- Animate on load
-- PropTypes validation
+TASK 8: Income vs Expense Chart
+Create FILE: src/components/analytics/IncomeVsExpenseChart.tsx
+'use client':
+- Recharts ComposedChart
+- Bars: income (green) and expenses (red)
+- Line: net savings (blue)
+- Last 12 months on X axis
+- TypeScript props
 
-TASK 9: Bar Chart Component
-Create FILE: frontend/src/components/Charts/MonthlyComparisonChart.jsx
-Using Recharts BarChart:
-- Grouped bars: This month vs Last month
-- Per category
-- Tooltip with difference
-- Color coding
-- Responsive container
-- PropTypes validation
+TASK 9: Insight Card
+Create FILE: src/components/analytics/InsightCard.tsx
+Server Component (static display):
+- Shadcn Card with colored left border based on severity
+- Icon from lucide-react based on type
+- Title (bold) + message
+- Amount/percentage badge if present
+- Color scheme:
+  info=blue, warning=amber, success=green, danger=red
+- TypeScript props: Insight type
 
-TASK 10: Income vs Expense Chart
-Create FILE: frontend/src/components/Charts/IncomeVsExpenseChart.jsx
-Using Recharts ComposedChart:
-- Bars for income and expenses
-- Line for net savings
-- Last 12 months
-- Responsive
-- PropTypes validation
-
-TASK 11: Category Breakdown Table
-Create FILE: frontend/src/components/Analytics/CategoryBreakdown.jsx
-- Table: Category | Amount | % of Total | Budget | Status
-- Sort by amount desc
-- Color-coded status indicators
-- Mini progress bars
-- Expandable rows (show top 3 expenses in category)
-- PropTypes validation
-
-TASK 12: InsightCard Component
-Create FILE: frontend/src/components/Analytics/InsightCard.jsx
-- Icon based on type (info, warning, success, danger)
-- Title (bold)
-- Message (description)
-- Colored border/background based on severity
-- Amount highlight if present
-- PropTypes validation
-
-TASK 13: InsightsPanel Component
-Create FILE: frontend/src/components/Analytics/InsightsPanel.jsx
+TASK 10: Insights Panel
+Create FILE: src/components/analytics/InsightsPanel.tsx
+'use client':
 - Grid of InsightCards
-- Group by severity (critical first)
-- Empty state: "No insights yet. Add more expenses to see patterns"
-- Loading skeleton
-- Refresh button
-- PropTypes validation
+- Sort: danger first, then warning, info, success
+- Empty state: "Add more expenses to see patterns"
+- Skeleton loading state
+- Refresh button (refetch query)
+- TypeScript props
 
-TASK 14: RecentTransactions Component
-Create FILE: frontend/src/components/Dashboard/RecentTransactions.jsx
-- Last 10 transactions
-- Category icon + name
-- Description
-- Amount (expenses red, income green)
-- Date
-- "View all" link → expenses page
-- Loading skeleton
-- PropTypes validation
+TASK 11: Recent Transactions
+Create FILE: src/components/dashboard/RecentTransactions.tsx
+Server Component:
+- Shadcn Table
+- 10 most recent expenses
+- Columns: Category icon | Description | Date | Amount (red/green)
+- "View all expenses →" link
+- TypeScript props: ExpenseWithCategory[]
 
-TASK 15: Analytics Page
-Create FILE: frontend/src/pages/AnalyticsPage.jsx
-Full analytics view:
+TASK 12: Analytics Page
+Create FILE: src/app/(dashboard)/analytics/page.tsx
+Server Component: fetch data, pass to client
+Create FILE: src/components/analytics/AnalyticsPageClient.tsx
+'use client':
 - Month/Year selector
-- Summary section
-- Tab navigation: Overview | Trends | Categories | Insights
-- Overview tab: charts grid
-- Trends tab: SpendingTrendChart full width + period selector
-- Categories tab: CategoryBreakdown full table
-- Insights tab: InsightsPanel full width
-- Export charts as PNG button
+- Shadcn Tabs: Overview | Trends | Categories | Insights
+- Overview: SummaryCards + PieChart + LineChart grid
+- Trends: SpendingTrendChart full width + IncomeVsExpenseChart
+- Categories: CategoryBreakdown table + MonthlyComparisonChart
+- Insights: InsightsPanel full width
+
+TASK 13: Category Breakdown Table
+Create FILE: src/components/analytics/CategoryBreakdown.tsx
+Server Component:
+- Shadcn Table
+- Columns: Category | Transactions | Amount | % Total | Budget | Status
+- Shadcn Badge for status (green/yellow/red)
+- Mini Shadcn Progress bars in Budget column
+- Sortable (client enhancement)
+- TypeScript props: CategoryBreakdown[]
 
 === VERIFICATION CHECKLIST ===
-[ ] Dashboard loads with real data from API
-[ ] Pie chart shows category breakdown correctly
-[ ] Line chart shows trends over 6 months
-[ ] Insights generate based on spending patterns
+[ ] Dashboard loads with real data from DB (Server Component)
+[ ] Pie chart shows category breakdown
+[ ] Line chart shows 6-month trends
+[ ] Insights generate based on actual spending data
 [ ] Month selector changes all data
-[ ] Budget alerts show on dashboard
-[ ] Recent transactions link to expenses page
-[ ] Analytics page tabs all work
+[ ] Budget alerts visible on dashboard
+[ ] Analytics page: all 4 tabs work
 [ ] Charts are responsive on mobile
-[ ] All data loads with proper loading states
+[ ] Server Components fetch data, Client Components handle interactivity
+[ ] TypeScript: npm run type-check (zero errors)
 ```
 
 ---
 ## ✅ PHASE 5 EXPECTED OUTPUT
 ```
-Files Created: ~20 files
-API Endpoints: 6 analytics endpoints
-Frontend: Dashboard + Analytics pages
-Charts: Pie, Line, Bar, Composed charts (Recharts)
-Insights: 7 rule-based insight generators
+Files Created: ~18 files
+API Routes: 5 analytics routes
+Frontend: Dashboard + Analytics pages with Recharts
+Pattern: Server Components for data fetch, Client for charts
+Insights: 7 rule-based insight generators (TypeScript)
 Features: Monthly comparison, trends, projections
 ```
 
@@ -1827,198 +1675,132 @@ Features: Monthly comparison, trends, projections
 EXECUTE PHASE 6: Reports & Export System
 AGENTS: Data Analysis Agent (Primary) + Web Development Agent (Secondary)
 
-=== BACKEND: Reports API ===
+=== BACKEND: Reports API Routes ===
 
-TASK 1: Reports Routes
-Create FILE: backend/src/routes/reports.routes.js
-Endpoints:
-- GET  /api/reports/monthly     (?year=2024&month=1)
-- GET  /api/reports/yearly      (?year=2024)
-- GET  /api/reports/custom      (?startDate=&endDate=)
-- POST /api/reports/export/csv  (export expenses as CSV)
-- POST /api/reports/export/pdf  (generate PDF report)
+TASK 1: Reports API
+Create FILE: src/app/api/reports/route.ts
+GET handler with ?type= param:
+- ?type=monthly&year=2024&month=1
+- ?type=yearly&year=2024
+- ?type=custom&startDate=2024-01-01&endDate=2024-03-31
 
-TASK 2: Reports Controller
-Create FILE: backend/src/controllers/reports.controller.js
+Returns typed ReportData with:
+- period label, summary, categoryBreakdown
+- dailyBreakdown, topExpenses (5 largest)
+- budgetPerformance, incomeBySource
+- insights, previousPeriodComparison
 
-getMonthlyReport():
-Comprehensive monthly summary:
-{
-  period: { year, month, label: "January 2024" },
-  summary: { totalExpenses, totalIncome, netSavings, savingsRate },
-  categoryBreakdown: [...],
-  dailyBreakdown: [...],  // day-by-day spending
-  topExpenses: [...],     // top 5 largest
-  budgetPerformance: [...], // budget vs actual
-  incomeBySource: [...],
-  insights: [...],
-  previousMonthComparison: {...}
-}
+Create FILE: src/app/api/reports/export/route.ts
+POST handler with body: { type: 'csv' | 'pdf', reportData, period }
+- 'csv': generate CSV, return with Content-Disposition: attachment
+- 'pdf': generate PDF buffer with PDFKit, return as application/pdf
 
-getYearlyReport():
-{
-  year: 2024,
-  summary: { totalExpenses, totalIncome, netSavings, avgMonthlySpend },
-  monthlyBreakdown: [...],  // Jan-Dec
-  categoryBreakdown: [...],
-  topMonths: { highest, lowest },
-  trends: { ...}
-}
+TASK 2: Export Services
+Create FILE: src/lib/utils/pdfGenerator.ts
+TypeScript PDF generator:
+- generateReport(reportData: ReportData): Promise<Buffer>
+- Uses PDFKit
+- Sections: header, summary boxes, category table, top expenses, insights
+- Proper TypeScript types throughout
 
-getCustomReport():
-Same as monthly but for any date range
-
-exportCSV():
-- Generate CSV with all expenses in date range
-- Columns: Date, Category, Description, Amount, Payment Method
-- Include totals row at bottom
-- Return as file download (Content-Disposition: attachment)
-
-exportPDF():
-Using PDFKit:
-Generate PDF with:
-- Header: SmartExpense Tracker logo text, report title, period, generated date
-- Summary section: key metrics in boxes
-- Category breakdown table
-- Monthly trend (text-based bar chart)
-- Top expenses list
-- Footer: page numbers
-- Return as file download
-
-TASK 3: PDF Service
-Create FILE: backend/src/services/pdf.service.js
-- generateMonthlyReport(data): creates PDF buffer
-- generateYearlyReport(data): creates PDF buffer
-- addHeader(doc, title, period): helper
-- addSummarySection(doc, summary): helper
-- addCategoryTable(doc, categories): helper
-- addTopExpenses(doc, expenses): helper
-- addFooter(doc): helper
-
-TASK 4: CSV Service
-Create FILE: backend/src/services/csv.service.js
-- generateExpensesCSV(expenses): returns CSV string
-- generateReportCSV(reportData): full report as CSV
-- formatCurrency(amount, currency): helper
-- parseIncomingCSV(fileBuffer): parse imported CSV
+Create FILE: src/lib/utils/csvGenerator.ts
+TypeScript CSV generator:
+- generateExpensesCSV(expenses: ExpenseWithCategory[]): string
+- generateReportCSV(reportData: ReportData): string
+- Using json2csv library
+- Proper column headers + formatting
 
 === FRONTEND: Reports UI ===
 
-TASK 5: Reports Service
-Create FILE: frontend/src/services/reports.service.js
-- getMonthlyReport(year, month)
-- getYearlyReport(year)
-- getCustomReport(startDate, endDate)
-- exportCSV(params): triggers file download
-- exportPDF(params): triggers file download
+TASK 3: Reports Hooks
+Create FILE: src/lib/hooks/useReports.ts
+'use client':
+- useMonthlyReport(year, month): useQuery
+- useYearlyReport(year): useQuery
+- useCustomReport(startDate, endDate): useQuery
+- useExportReport(): useMutation (triggers file download)
 
-Create FILE: frontend/src/hooks/useReports.js
-- useMonthlyReport(year, month)
-- useYearlyReport(year)
-- useCustomReport(dateRange)
+TASK 4: Report Components
+Create FILE: src/components/reports/ReportSummary.tsx
+Server Component:
+- Shadcn Cards grid showing key metrics
+- Period label prominently shown
+- Comparison indicators (vs previous period)
+- TypeScript props: ReportData
 
-TASK 6: ReportSummary Component
-Create FILE: frontend/src/components/Reports/ReportSummary.jsx
-- Key metrics in cards
-- Period label
-- Comparison indicators
-- Print-friendly styling
-- PropTypes validation
+Create FILE: src/components/reports/ReportCategoryTable.tsx
+Server Component:
+- Shadcn Table
+- Full breakdown with totals row
+- Sortable columns
+- Status badges
+- TypeScript props
 
-TASK 7: ReportCategoryTable Component
-Create FILE: frontend/src/components/Reports/ReportCategoryTable.jsx
-- Full category breakdown table
-- Columns: Category | Transactions | Total | % of Spending | Budget | Status
-- Sortable
-- Totals row
-- Color-coded status
-- PropTypes validation
-
-TASK 8: DailyBreakdownChart Component
-Create FILE: frontend/src/components/Reports/DailyBreakdownChart.jsx
-Using Recharts BarChart:
-- Day-by-day spending for the month
+Create FILE: src/components/reports/DailyBreakdownChart.tsx
+'use client':
+- Recharts BarChart per day
 - Highlight highest spending day
-- Average line overlay
-- Tooltip with date + amount
-- PropTypes validation
+- Average line (ReferenceLine)
+- TypeScript props
 
-TASK 9: ExportButtons Component
-Create FILE: frontend/src/components/Reports/ExportButtons.jsx
-- Export CSV button with download icon
-- Export PDF button with download icon
+Create FILE: src/components/reports/ExportButtons.tsx
+'use client':
+- Export CSV button (Download icon)
+- Export PDF button (FileText icon)
 - Loading state during export
-- Success toast on completion
-- Error handling
-- PropTypes validation
+- Shadcn Sonner toast on success
+- TypeScript props
 
-TASK 10: DateRangePicker Component
-Create FILE: frontend/src/components/Common/DateRangePicker.jsx
-- Two date inputs (start, end)
-- Preset ranges: This month, Last month, Last 3 months, Last 6 months, This year
-- Custom range option
-- Validation: end > start, not future dates
-- PropTypes validation
+TASK 5: Date Range Picker
+Create FILE: src/components/common/DateRangePicker.tsx
+'use client':
+- Shadcn Popover + Calendar (range mode)
+- Preset buttons: This month, Last month, Last 3M, Last 6M, This year
+- Validate: end >= start
+- onChange: (range: { from: Date; to: Date }) => void
+- TypeScript props
 
-TASK 11: Reports Page
-Create FILE: frontend/src/pages/ReportsPage.jsx
-Layout:
-- Tab navigation: Monthly | Yearly | Custom
-- Monthly tab:
-  - Month/Year selector
-  - Generate button
-  - ReportSummary cards
-  - DailyBreakdownChart
-  - ReportCategoryTable
-  - ExportButtons
-- Yearly tab:
-  - Year selector
-  - Annual summary
-  - Monthly trend chart (all 12 months)
-  - Category totals for year
-  - ExportButtons
-- Custom tab:
-  - DateRangePicker
-  - Generate button
-  - Report display
-  - ExportButtons
-- Print page button (window.print())
-- Print CSS: hide navigation, show report full width
+TASK 6: Reports Page
+Create FILE: src/app/(dashboard)/reports/page.tsx
+Server Component + metadata
+Create FILE: src/components/reports/ReportsPageClient.tsx
+'use client':
+- Shadcn Tabs: Monthly | Yearly | Custom
+- Month selector (Monthly tab)
+- Year selector (Yearly tab)
+- DateRangePicker (Custom tab)
+- Generate button
+- ReportSummary + DailyBreakdownChart + ReportCategoryTable
+- ExportButtons
+- Print button (window.print())
 
-TASK 12: Toast Notification Component
-Create FILE: frontend/src/components/Common/Toast.jsx
-- Success, Error, Warning, Info variants
-- Auto-dismiss after 3s
-- Stack multiple toasts
-- Close button
-- Slide-in animation
-- PropTypes validation
-
-Create FILE: frontend/src/context/ToastContext.jsx
-- showToast(message, type, duration) function
-- Provider component
-- Hook: useToast()
+TASK 7: Toast/Notification Setup
+Create FILE: src/components/common/ToastProvider.tsx
+'use client':
+- Shadcn Sonner component (already installed)
+- Add to root layout
+- Export toast helper function
 
 === VERIFICATION CHECKLIST ===
-[ ] Monthly report generates with all sections
+[ ] Monthly report generates with all data
 [ ] Yearly report shows all 12 months
-[ ] Custom date range report works
-[ ] CSV downloads with correct data
+[ ] Custom date range works
+[ ] CSV downloads correctly
 [ ] PDF generates and downloads
-[ ] PDF has proper formatting and all sections
-[ ] Print mode hides navigation
-[ ] Toast notifications appear correctly
+[ ] PDF has proper sections and formatting
+[ ] Toast notifications appear on export
 [ ] Date range picker validates correctly
 [ ] Reports page responsive on mobile
+[ ] TypeScript: npm run type-check (zero errors)
 ```
 
 ---
 ## ✅ PHASE 6 EXPECTED OUTPUT
 ```
-Files Created: ~15 files
-API Endpoints: 5 report endpoints
+Files Created: ~12 files
+API Routes: 4 report routes (monthly, yearly, custom, export)
 Frontend: Reports page with 3 report types
-Export: CSV and PDF generation working
+Export: TypeScript CSV and PDF generation
 Features: Monthly, yearly, custom reports + export
 ```
 
@@ -2032,7 +1814,7 @@ Features: Monthly, yearly, custom reports + export
 > **Trigger:** Say `"Execute Phase 7"` in Claude Code
 > **Agent:** Web Development Agent (Primary)
 > **Duration:** Day 15
-> **Goal:** User profile, app settings, category management
+> **Goal:** User profile, settings, category management, account stats
 
 ---
 
@@ -2042,126 +1824,112 @@ Features: Monthly, yearly, custom reports + export
 EXECUTE PHASE 7: Settings & User Profile
 AGENT: Web Development Agent
 
-=== BACKEND: User Profile API ===
+=== BACKEND: User API Routes ===
 
-TASK 1: User Routes
-Create FILE: backend/src/routes/user.routes.js
-Endpoints:
-- GET    /api/users/profile          (get profile)
-- PUT    /api/users/profile          (update profile)
-- PUT    /api/users/change-password  (change password)
-- DELETE /api/users/account          (delete account)
-- GET    /api/users/stats            (user statistics)
+TASK 1: User API
+Create FILE: src/app/api/user/profile/route.ts
+GET: requireAuth, return user (exclude passwordHash)
+PUT: requireAuth, validate updateProfileSchema (Zod: name, currency enum), Drizzle update
 
-Create FILE: backend/src/controllers/user.controller.js
-
-getProfile():
-- Return user data (excluding passwordHash)
-- Include: totalExpenses count, totalIncome count, accountAge
-
-updateProfile():
-- Validate: name (2-100 chars), currency (USD/EUR/GBP/etc.)
-- Update user record
-- Return updated profile
-
-changePassword():
-- Validate current password matches
+Create FILE: src/app/api/user/change-password/route.ts
+POST: requireAuth, validate (currentPassword, newPassword, confirmPassword)
+- Compare currentPassword with stored hash
 - Validate new password strength
-- Hash new password
-- Update user record
-- Invalidate all existing sessions (optional)
+- Hash new password, update DB
 
-deleteAccount():
-- Require password confirmation
-- Soft delete: set deletedAt on user
-- Schedule hard delete after 30 days (just set flag)
-- Return confirmation
+Create FILE: src/app/api/user/stats/route.ts
+GET: requireAuth, return aggregate stats:
+- totalExpenses count + sum
+- totalIncome count + sum
+- topCategory name + amount
+- accountAge in days
+- budgetsCreated count, categoriesCreated count
 
-getUserStats():
-{
-  totalExpenses: count,
-  totalExpensesAmount: decimal,
-  totalIncome: count,
-  totalIncomeAmount: decimal,
-  topCategory: { name, amount },
-  accountCreated: date,
-  daysActive: number,
-  budgetsCreated: count,
-  categoriesCreated: count
-}
+Create FILE: src/app/api/user/delete-account/route.ts
+POST: requireAuth, require password confirmation
+- Verify password matches
+- Soft delete user (set deletedAt)
+- Call NextAuth signOut
+- Return success
+
+Zod schemas in src/lib/validations/user.ts:
+- updateProfileSchema: name (2-100), currency (enum: USD/EUR/GBP/INR/CAD/AUD)
+- changePasswordSchema: currentPassword, newPassword (strong), confirmPassword
+- deleteAccountSchema: password
 
 === FRONTEND: Settings UI ===
 
-TASK 2: User Service
-Create FILE: frontend/src/services/user.service.js
-- getProfile()
-- updateProfile(data)
-- changePassword(currentPassword, newPassword)
-- deleteAccount(password)
-- getUserStats()
+TASK 2: Settings Page
+Create FILE: src/app/(dashboard)/settings/page.tsx
+Server Component:
+- requireAuth()
+- Fetch user profile server-side
+- Metadata: title "Settings"
 
-TASK 3: ProfileForm Component
-Create FILE: frontend/src/components/Settings/ProfileForm.jsx
-Fields:
-- Name (text input)
-- Email (display only, not editable)
-- Currency preference (select: USD, EUR, GBP, INR, CAD, AUD)
-- Save button
-- Success/error messages
-- PropTypes validation
+Create FILE: src/components/settings/SettingsPageClient.tsx
+'use client':
+- Shadcn Tabs: Profile | Security | Categories | Danger Zone
 
-TASK 4: ChangePasswordForm Component
-Create FILE: frontend/src/components/Settings/ChangePasswordForm.jsx
-Fields:
-- Current password
-- New password (with strength indicator)
-- Confirm new password
-- Submit button
-- Loading state
-- Clear on success
-- PropTypes validation
+TASK 3: Profile Form
+Create FILE: src/components/settings/ProfileForm.tsx
+'use client':
+- React Hook Form + Zod (updateProfileSchema)
+- Shadcn Form fields: name (Input), currency (Select)
+- Email field: display only, not editable
+- Save button with loading state
+- Shadcn Sonner toast on success/error
+- TypeScript props: initial user data
 
-TASK 5: DangerZone Component
-Create FILE: frontend/src/components/Settings/DangerZone.jsx
-- Delete account button (red, outlined)
-- Confirmation modal: type "DELETE" to confirm + password
-- Warning about data loss
-- PropTypes validation
+TASK 4: Change Password Form
+Create FILE: src/components/settings/ChangePasswordForm.tsx
+'use client':
+- React Hook Form + Zod (changePasswordSchema)
+- 3 password fields with show/hide toggles
+- Real-time password strength indicator
+- POST /api/user/change-password
+- Clear fields on success
+- Toast notification
+- TypeScript strict
 
-TASK 6: UserStats Component
-Create FILE: frontend/src/components/Settings/UserStats.jsx
-- Stat cards: Total Transactions, Total Tracked, Account Age, Categories
-- Visual and informative
-- PropTypes validation
+TASK 5: User Stats
+Create FILE: src/components/settings/UserStats.tsx
+Server Component:
+- Fetch from /api/user/stats server-side
+- Shadcn Cards grid:
+  Total Transactions | Total Tracked | Account Age | Categories Created
+- Clean data visualization
 
-TASK 7: CategoryManager Component
-Create FILE: frontend/src/components/Settings/CategoryManager.jsx
-- List all user custom categories
-- Show: icon, color, name, expense count
-- Edit button (inline edit)
-- Delete button (disabled if has expenses)
-- Add new category button
-- Color picker for category color
-- Emoji/icon picker for category icon
-- PropTypes validation
+TASK 6: Category Manager
+Create FILE: src/components/settings/CategoryManager.tsx
+'use client':
+- useCategories() hook
+- List user custom categories (not system defaults)
+- Each category: color swatch + icon + name + expense count
+- Edit button → inline edit or Dialog
+- Delete: disabled if has expenses (show tooltip)
+- Add new category button → Dialog with CategoryForm
+- TypeScript props
 
-TASK 8: Settings Page
-Create FILE: frontend/src/pages/SettingsPage.jsx
-Tab navigation:
-- Profile: ProfileForm + UserStats
-- Security: ChangePasswordForm
-- Categories: CategoryManager
-- Danger Zone: DangerZone
+TASK 7: Danger Zone
+Create FILE: src/components/settings/DangerZone.tsx
+'use client':
+- Shadcn Card with red border
+- Delete account button (Shadcn Button variant="destructive")
+- Shadcn AlertDialog: type "DELETE" text input + password field
+- Warning about permanent data loss
+- On confirm: POST /api/user/delete-account → signOut() → redirect /
+- TypeScript strict
 
 === VERIFICATION CHECKLIST ===
-[ ] Update name and currency → saves correctly
-[ ] Change password → works with valid current password
-[ ] Rejects wrong current password
+[ ] Profile update saves correctly
+[ ] Currency change reflects in expense amounts
+[ ] Change password: requires correct current password
+[ ] Change password: validates new password strength
 [ ] Account stats load correctly
 [ ] Category manager: add/edit/delete works
-[ ] Delete account: requires "DELETE" confirmation
-[ ] Settings page tabs work
-[ ] Currency changes reflect in expense display
+[ ] Delete account: requires typing "DELETE" + password
+[ ] Settings tabs all work
+[ ] TypeScript: npm run type-check (zero errors)
 ```
 
 ---
@@ -2174,7 +1942,7 @@ Tab navigation:
 > **Trigger:** Say `"Execute Phase 8"` in Claude Code
 > **Agent:** Web Development Agent (Primary) + General Purpose Agent (Secondary)
 > **Duration:** Day 16-17
-> **Goal:** Comprehensive testing, bug fixes, code quality
+> **Goal:** Vitest unit/integration tests, Playwright E2E, TypeScript audit, security
 
 ---
 
@@ -2184,168 +1952,171 @@ Tab navigation:
 EXECUTE PHASE 8: Testing & Quality Assurance
 AGENTS: Web Development Agent + General Purpose Agent
 
-=== BACKEND TESTING ===
+=== VITEST UNIT & INTEGRATION TESTS ===
 
-TASK 1: Test Setup
-Create FILE: backend/jest.config.js
-- Test environment: node
-- Coverage thresholds: 70%
-- Setup files
-- Test database: separate test DB or SQLite
+TASK 1: Test Utilities
+Create FILE: src/test/utils.tsx
+- renderWithProviders(): wraps components with QueryClient + auth providers
+- createMockUser(): returns typed mock User
+- createMockExpense(): returns typed mock Expense
+- createMockCategory(): returns typed mock Category
+- mockSession(): mocks useSession for client components
 
-Create FILE: backend/src/__tests__/setup.js
-- Connect to test database
-- Run migrations
-- Seed test data
-- Cleanup after all tests
+TASK 2: API Route Tests
+Create FILE: src/test/api/auth.test.ts
+- Register: valid data, duplicate email, weak password
+- Login: valid, wrong password, missing fields
+- Forgot password: valid email, unknown email (same response)
+- Reset password: valid token, expired token
 
-Create FILE: backend/src/__tests__/helpers.js
-- createTestUser(): creates user + returns token
-- createTestExpense(userId): creates expense
-- createTestCategory(userId): creates category
-- cleanupDatabase(): truncate all tables
+Create FILE: src/test/api/expenses.test.ts
+- GET with filters: date range, category, pagination
+- POST: valid, invalid amount, missing required fields
+- PUT: own expense, another user's expense (403)
+- DELETE: soft delete, verify not returned after delete
 
-TASK 2: Complete Auth Tests
-Create FILE: backend/src/__tests__/auth.test.js (complete version)
-Test all scenarios:
-- Register: valid, duplicate email, weak password, missing fields
-- Login: valid, wrong password, wrong email, rate limiting
-- Refresh token: valid, expired, tampered
-- Me endpoint: with/without auth
-- Password reset flow: complete end-to-end
-
-TASK 3: Expense Tests
-Create FILE: backend/src/__tests__/expenses.test.js
-- CRUD operations with valid data
-- Authorization: can't access other users' expenses
-- Filters: date range, category, amount range, search
-- Pagination: correct page, limit, totals
-- Soft delete: expense not returned after delete
-- Validation: negative amount, future date, invalid category
-
-TASK 4: Analytics Tests
-Create FILE: backend/src/__tests__/analytics.test.js
-- Summary: correct totals for period
+Create FILE: src/test/api/analytics.test.ts
+- Summary: correct totals for month
 - Category breakdown: correct percentages
-- Insights: generated based on test data
-- Comparison: correct month-over-month change
+- Insights: generates based on test data patterns
+- Trends: correct 6-month data
 
-TASK 5: Budget Tests
-Create FILE: backend/src/__tests__/budget.test.js
-- Create budget
-- Budget status calculation
-- Alerts when >80%
-- Duplicate budget prevention
+TASK 3: Component Tests
+Create FILE: src/test/components/ExpenseForm.test.tsx
+- Renders all Shadcn form fields
+- Zod validation: required fields, positive amount
+- Submits correct typed data
+- Edit mode pre-populates values
+- Loading state during submit
 
-=== FRONTEND TESTING ===
+Create FILE: src/test/components/BudgetCard.test.tsx
+- Renders budget info correctly
+- Correct progress percentage calculation
+- Warning state at 80% (yellow)
+- Exceeded state at 100% (red)
+- Edit/delete actions trigger correct callbacks
 
-TASK 6: Component Tests
-Create tests for key components:
+Create FILE: src/test/components/LoginForm.test.tsx
+- Renders email and password fields
+- Validates email format (Zod)
+- Shows loading on submit
+- Displays error message from NextAuth
 
-backend/src/__tests__/components/ExpenseForm.test.jsx:
-- Renders all fields
-- Validates required fields
-- Validates positive amount
-- Submits correct data
-- Edit mode populates fields
-- Error display
+Create FILE: src/test/utils/analytics.test.ts
+- calculateMonthlyTotal: correct sum
+- generateInsights: returns array of Insight type
+- calculateTrends: correct month-over-month data
+- detectSpendingPatterns: weekend vs weekday
 
-frontend/src/__tests__/components/LoginForm.test.jsx:
-- Renders correctly
-- Email validation
-- Password required
-- Loading state
-- Error display
+=== PLAYWRIGHT E2E TESTS ===
 
-frontend/src/__tests__/components/BudgetCard.test.jsx:
-- Renders budget info
-- Correct progress calculation
-- Warning state at 80%
-- Exceeded state at 100%
-- Edit/delete actions
+TASK 4: Playwright Setup
+Create FILE: playwright.config.ts
+- baseURL: http://localhost:3000
+- Test browsers: Chromium, Firefox
+- Screenshots on failure
+- Video on first retry
+- Parallel: false (auth state shared)
 
-frontend/src/__tests__/components/InsightCard.test.jsx:
-- Renders each severity type
-- Correct icon for type
-- Message display
+Create FILE: src/test/e2e/auth.spec.ts
+Playwright E2E:
+- User can register new account
+- User can login with credentials
+- Unauthenticated user redirected to /login
+- Authenticated user redirected from /login to /dashboard
 
-TASK 7: Hook Tests
-Create FILE: frontend/src/__tests__/hooks/useExpenses.test.js
-- Fetches expenses on mount
-- Refetches on filter change
-- Creates expense and invalidates cache
-- Delete expense removes from list
+Create FILE: src/test/e2e/expenses.spec.ts
+Playwright E2E (full user journey):
+- Login → navigate to expenses
+- Create new expense via form
+- Verify expense appears in list
+- Edit expense → verify changes
+- Delete expense → verify removed
+- Filter by category → verify filtered results
 
-=== QUALITY CHECKS ===
+Create FILE: src/test/e2e/dashboard.spec.ts
+Playwright E2E:
+- Dashboard loads with charts visible
+- Summary cards show data
+- Navigation links work
+- Month selector changes data
 
-TASK 8: ESLint Configuration
-Create FILE: backend/.eslintrc.js
-- Node.js environment
-- Express best practices
-- No console.log in production
-- Unused variables as errors
-- Consistent return
+=== TYPESCRIPT AUDIT ===
 
-Create FILE: frontend/.eslintrc.js
-- React rules
-- Hooks rules
-- PropTypes required
-- No unused imports
-- Accessibility (jsx-a11y)
+TASK 5: Fix All TypeScript Errors
+Run: npm run type-check
+Fix ALL errors until output shows: "Found 0 errors"
 
-TASK 9: Prettier Configuration
-Create FILE: .prettierrc (root)
-{
-  "semi": true,
-  "singleQuote": true,
-  "tabWidth": 2,
-  "trailingComma": "es5",
-  "printWidth": 100
-}
+Common fixes needed:
+- Add return types to all async functions
+- Replace any types with proper interfaces
+- Add null checks where needed
+- Ensure Drizzle query results are properly typed
+- Ensure Zod inferred types match expected types
 
-TASK 10: Run All Checks
-Execute and fix all issues:
-1. cd backend && npm test (aim for 70%+ coverage)
-2. cd frontend && npm test (all tests pass)
-3. cd backend && npm run lint (zero errors)
-4. cd frontend && npm run lint (zero errors)
-5. cd backend && npm run format
-6. cd frontend && npm run format
+TASK 6: ESLint + Prettier Audit
+Run: npm run lint
+Fix all ESLint errors (warnings OK)
 
-Fix any failing tests or linting errors found.
+Ensure .eslintrc.json includes:
+- @typescript-eslint/no-explicit-any: error
+- @typescript-eslint/no-unused-vars: error
+- react-hooks/exhaustive-deps: warn
+- no-console: warn (not error, for dev logging)
 
-TASK 11: Performance Check
-Create FILE: backend/src/middleware/performance.middleware.js
-- Request timing middleware
-- Log slow requests (>500ms)
-- Add X-Response-Time header
+Run: npm run format (Prettier)
+Format all files consistently
 
-Review and add missing indexes:
-- expenses: (userId, date), (categoryId), (deletedAt)
-- income: (userId, date)
-- budgets: (userId, categoryId)
+=== SECURITY AUDIT ===
 
-TASK 12: Security Audit
-Check and implement:
-- All routes have auth middleware where needed
-- Input validation on all POST/PUT endpoints
-- Parameterized queries (Prisma handles this)
-- Rate limiting on auth endpoints
-- CORS properly configured
-- Helmet headers set
-- No sensitive data in responses (no passwordHash in user objects)
-- File upload validation (type + size)
+TASK 7: Security Checklist
+Verify and fix:
+[ ] All API routes call requireAuth() before DB operations
+[ ] All DB queries filter by userId from session (not from request body)
+[ ] Zod validation on all POST/PUT route bodies
+[ ] No passwordHash returned in any API response (select specific fields)
+[ ] NextAuth NEXTAUTH_SECRET is strong (32+ chars)
+[ ] No secrets hardcoded anywhere (use process.env)
+[ ] .env files in .gitignore
+[ ] Rate limiting: add to auth routes using next-rate-limit or custom
+
+Create FILE: src/middleware.ts (update)
+- Add rate limiting for /api/auth/* routes
+- Max 10 requests per minute per IP
+- Return 429 with Retry-After header
+
+=== RUN ALL CHECKS ===
+
+TASK 8: Final Verification
+Execute all quality checks:
+1. npm run type-check    → must show 0 errors
+2. npm test             → all Vitest tests pass
+3. npm run test:e2e     → all Playwright tests pass  
+4. npm run lint         → zero errors (warnings OK)
+5. npm run build        → production build succeeds
+
+Fix any failures before proceeding to Phase 9.
 
 === VERIFICATION CHECKLIST ===
-[ ] All backend tests pass: npm test
-[ ] All frontend tests pass: npm test
-[ ] Coverage > 70% backend
-[ ] ESLint: zero errors (warnings OK)
-[ ] Prettier: code formatted
-[ ] No console.logs in production code
-[ ] All API routes protected correctly
-[ ] Performance middleware logging slow requests
-[ ] Security headers present in responses
+[ ] npm run type-check: 0 TypeScript errors
+[ ] npm test: all Vitest tests pass
+[ ] npm run test:e2e: Playwright E2E tests pass
+[ ] npm run lint: 0 ESLint errors
+[ ] npm run build: builds successfully
+[ ] No any types in codebase
+[ ] All API routes protected
+[ ] Security checklist completed
+```
+
+---
+## ✅ PHASE 8 EXPECTED OUTPUT
+```
+Files Created: ~20 test files
+Tests: Vitest unit + integration + Playwright E2E
+TypeScript: 0 errors (strict mode)
+ESLint: 0 errors
+Build: Production build succeeds
+Security: All routes protected, no sensitive data leaks
 ```
 
 ---
@@ -2358,209 +2129,193 @@ Check and implement:
 > **Trigger:** Say `"Execute Phase 9"` in Claude Code
 > **Agent:** DevOps Agent (Primary)
 > **Duration:** Day 18-19
-> **Goal:** GitHub Actions, deployment to Vercel + Railway, monitoring
+> **Goal:** GitHub Actions CI/CD, Vercel deployment, monitoring setup
 
 ---
 
 ## PHASE 9 — PROMPT FOR CLAUDE CODE
 
 ```
-EXECUTE PHASE 9: CI/CD Pipeline & Deployment
+EXECUTE PHASE 9: CI/CD Pipeline & Vercel Deployment
 AGENT: DevOps Agent
 
-=== CI/CD PIPELINE ===
+=== GITHUB ACTIONS ===
 
-TASK 1: GitHub Actions - CI Pipeline
+TASK 1: CI Pipeline
 Create FILE: .github/workflows/ci.yml
 Triggers: push to any branch, PR to main/develop
 
 Jobs:
-1. backend-test:
+1. type-check:
    - Setup Node.js 20
-   - Start PostgreSQL service
-   - Install dependencies
-   - Run Prisma migrate
-   - Run Jest tests with coverage
+   - npm ci
+   - npm run type-check (must be 0 errors)
+
+2. lint:
+   - npm run lint (fail on errors)
+   - npm run format:check (Prettier check)
+
+3. test:
+   - Setup PostgreSQL service (port 5433)
+   - Set DATABASE_URL in env
+   - npm ci
+   - npm run db:push (apply schema)
+   - npm run test (Vitest with coverage)
    - Upload coverage to Codecov
 
-2. frontend-test:
-   - Setup Node.js 20
-   - Install dependencies
-   - Run Jest tests
-   - Upload coverage
+4. build:
+   - npm run build
+   - Fail if build fails
+   - Upload build artifact
 
-3. lint:
-   - Run ESLint on both backend and frontend
-   - Run Prettier check
-   - Fail on any errors
+5. e2e (only on PR to main):
+   - Install Playwright browsers
+   - npm run dev (background)
+   - npm run test:e2e
+   - Upload Playwright report on failure
 
-4. security-scan:
-   - Run npm audit on both
-   - Fail on high/critical vulnerabilities
-
-TASK 2: GitHub Actions - CD Pipeline
+TASK 2: CD Pipeline
 Create FILE: .github/workflows/deploy.yml
 Triggers: push to main only
 
 Jobs:
-1. deploy-backend:
-   - Only if backend tests pass
-   - Deploy to Railway (using Railway CLI or webhook)
-   - Run database migrations on production
+1. deploy-vercel:
+   - Only if all CI checks pass
+   - Use Vercel CLI to deploy
+   - Run Drizzle migrations on production DB
    - Health check after deployment
+   - Comment deployment URL on commit
 
-2. deploy-frontend:
-   - Only if frontend tests pass
-   - Deploy to Vercel (using Vercel CLI)
-   - Set environment variables
+2. notify:
+   - Slack/email notification on success/failure
 
-3. notify:
-   - Slack notification on success/failure
-   - Include: branch, commit, author, environment URL
-
-TASK 3: GitHub Actions - PR Checks
+TASK 3: PR Checks
 Create FILE: .github/workflows/pr-check.yml
 Triggers: pull_request to main or develop
+- All CI checks + security scan (npm audit)
+- Comment test coverage % on PR
+- Block merge if type-check fails
 
-Checks:
-- All tests pass
-- Linting passes
-- Build succeeds
-- No security vulnerabilities
-- Branch naming convention check
-- PR title format check
+=== VERCEL DEPLOYMENT ===
 
-=== DEPLOYMENT CONFIGURATION ===
-
-TASK 4: Railway Configuration (Backend)
-Create FILE: railway.json
-{
-  "build": {
-    "builder": "NIXPACKS"
-  },
-  "deploy": {
-    "startCommand": "npm run db:migrate && node src/server.js",
-    "healthcheckPath": "/api/health",
-    "healthcheckTimeout": 30
-  }
-}
-
-Create FILE: backend/src/routes/health.routes.js
-GET /api/health:
-- Check database connection
-- Check memory usage
-- Return: { status: 'healthy', timestamp, uptime, database: 'connected' }
-
-TASK 5: Vercel Configuration (Frontend)
+TASK 4: Vercel Configuration
 Create FILE: vercel.json
+---
 {
+  "framework": "nextjs",
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
   "env": {
-    "VITE_API_URL": "@api_url"
-  }
+    "DATABASE_URL": "@database-url",
+    "NEXTAUTH_SECRET": "@nextauth-secret",
+    "NEXTAUTH_URL": "@nextauth-url"
+  },
+  "crons": [
+    {
+      "path": "/api/recurring/process",
+      "schedule": "0 0 * * *"
+    }
+  ]
 }
+---
 
-TASK 6: Production Dockerfile
-Create FILE: backend/Dockerfile.prod
-Multi-stage build:
-- Stage 1: Install dependencies
-- Stage 2: Build/prepare
-- Stage 3: Production runtime (minimal)
+Note: Next.js 14 on Vercel deploys frontend AND API routes together.
+No separate Railway backend needed.
+Database (PostgreSQL) still hosted on Railway.
+
+TASK 5: Health Check API Route
+Create FILE: src/app/api/health/route.ts
+GET handler (public, no auth):
+Returns:
+{
+  status: 'healthy',
+  timestamp: new Date().toISOString(),
+  version: process.env.npm_package_version,
+  database: 'connected' | 'disconnected',
+  environment: process.env.NODE_ENV
+}
+Tests DB connection with a simple Drizzle query.
+
+TASK 6: Production Dockerfile (Optional)
+Create FILE: Dockerfile
+For self-hosted deployment alternative:
+- Multi-stage Next.js build
+- Node.js 20 Alpine
+- Standalone output mode
 - Non-root user
-- Health check
-- Proper signal handling with dumb-init
 
-Create FILE: docker-compose.prod.yml
-- Production-ready configuration
-- Environment variables from .env
-- Nginx reverse proxy
-- SSL termination
-- Resource limits
+Update FILE: next.config.ts
+- output: 'standalone' (for Docker deployment)
 
-=== MONITORING SETUP ===
+=== MONITORING ===
 
-TASK 7: Health Check Endpoints
-Create FILE: backend/src/routes/health.routes.js
-- GET /api/health (public)
-- GET /api/health/detailed (protected, admin)
-Check:
-- Database connectivity
-- Memory usage
-- Response time
-- Version info
+TASK 7: Sentry Integration
+Install: npm install @sentry/nextjs
+Run: npx @sentry/wizard@latest -i nextjs
 
-TASK 8: Error Monitoring
-Create FILE: backend/src/config/monitoring.js
-Setup Sentry (free tier):
-- sentry.init() with DSN from env
-- Capture unhandled errors
-- Capture unhandled promise rejections
-- Add user context to errors
-- Filter out expected errors (404, validation)
-- Source map upload in CI/CD
+Create FILE: sentry.client.config.ts
+Create FILE: sentry.server.config.ts
+Create FILE: sentry.edge.config.ts
+- Configure DSN from env
+- Set environment (development/production)
+- Sample rate: 100% errors, 10% performance
+- Filter: don't send 404 or validation errors to Sentry
 
-Add to frontend:
-- Sentry browser SDK
-- Capture React errors (ErrorBoundary)
-- Capture user context after login
+TASK 8: Vercel Analytics
+Update FILE: src/app/layout.tsx
+Add: <Analytics /> from @vercel/analytics/react
+Add: <SpeedInsights /> from @vercel/speed-insights/next
+Install: npm install @vercel/analytics @vercel/speed-insights
 
-TASK 9: Logging Configuration
-Create FILE: backend/src/config/logger.js
-Using morgan + winston:
-- Development: colorized console output
-- Production: JSON format to file
-- Log rotation: daily files, keep 30 days
-- Log levels: error, warn, info, http, debug
-- Include: timestamp, level, message, correlationId
+TASK 9: Logging
+Create FILE: src/lib/utils/logger.ts
+TypeScript logger:
+- Development: console.log with colors
+- Production: structured JSON to stdout (Vercel captures this)
+- Levels: error, warn, info, debug
+- Include: timestamp, level, message, context
+- Never log: passwords, tokens, user PII
 
-TASK 10: Environment Variables Documentation
+=== DEPLOYMENT DOCUMENTATION ===
+
+TASK 10: Deployment Guide
 Create FILE: DEPLOYMENT.md
-Step-by-step deployment guide:
-1. Prerequisites (Node.js, PostgreSQL, accounts)
+Step-by-step guide:
+1. Prerequisites: Node.js 20, Vercel CLI, Railway account
 2. Local development setup
-3. Railway backend deployment
-4. Vercel frontend deployment
-5. Environment variables reference
-6. Database migration instructions
-7. Monitoring setup (Sentry)
-8. Custom domain setup
-9. SSL configuration
-10. Troubleshooting common issues
-
-TASK 11: Backup Strategy
-Create FILE: scripts/backup.sh
-- pg_dump to create database backup
-- Compress backup file
-- Timestamp in filename
-- Upload to S3 (optional, if configured)
-- Keep last 7 daily backups
-
-TASK 12: Performance Monitoring
-Create FILE: backend/src/middleware/metrics.middleware.js
-Track:
-- Request count by endpoint
-- Response time percentiles
-- Error rate by endpoint
-- Database query time
-Simple in-memory metrics (no external service needed)
-
-Expose: GET /api/metrics (protected, admin only)
+3. Railway: create PostgreSQL database (port 5433)
+4. Vercel: connect GitHub repo, set env variables
+5. Environment variables reference table
+6. Drizzle migrations on production
+7. Sentry setup
+8. Custom domain configuration
+9. Vercel cron jobs (for recurring expenses)
+10. Monitoring and alerting setup
+11. Rollback procedure
 
 === VERIFICATION CHECKLIST ===
-[ ] CI pipeline runs on every push
-[ ] All tests run in CI
-[ ] CD deploys to Railway on main push
+[ ] CI pipeline runs on every push (type-check, lint, test, build)
 [ ] CD deploys to Vercel on main push
-[ ] Health check endpoint returns 200
-[ ] Sentry captures errors in production
-[ ] Logs writing to files in production
-[ ] Database migrations run on deployment
-[ ] Environment variables set in Railway/Vercel
-[ ] Custom domain configured (if applicable)
-[ ] HTTPS working
+[ ] Health check returns 200 at /api/health
+[ ] Sentry capturing errors in production
+[ ] Vercel Analytics active
+[ ] Drizzle migrations run on deployment
+[ ] Vercel cron: /api/recurring/process runs daily
+[ ] All environment variables set in Vercel dashboard
+[ ] HTTPS working on production URL
+[ ] Production build performance: Lighthouse > 80
+```
+
+---
+## ✅ PHASE 9 EXPECTED OUTPUT
+```
+Files Created: ~12 files
+CI/CD: GitHub Actions running on all PRs and main push
+Deployment: Vercel (Next.js full-stack - frontend + API together)
+Database: Railway PostgreSQL
+Monitoring: Sentry + Vercel Analytics
+Cron: Daily recurring expenses processing
 ```
 
 ---
@@ -2573,7 +2328,7 @@ Expose: GET /api/metrics (protected, admin only)
 > **Trigger:** Say `"Execute Phase 10"` in Claude Code
 > **Agent:** General Purpose Agent (Primary) + Web Development Agent (Secondary)
 > **Duration:** Day 20
-> **Goal:** UI polish, performance optimization, documentation, launch ready
+> **Goal:** Suspense boundaries, error handling, performance, docs, launch
 
 ---
 
@@ -2583,210 +2338,225 @@ Expose: GET /api/metrics (protected, admin only)
 EXECUTE PHASE 10: Final Polish & Launch Preparation
 AGENTS: General Purpose Agent + Web Development Agent
 
+=== NEXT.JS PERFORMANCE OPTIMIZATION ===
+
+TASK 1: Suspense Boundaries
+Update all page.tsx Server Components:
+- Wrap async data sections in <Suspense fallback={<Skeleton />}>
+- Each chart wrapped in Suspense
+- Summary cards wrapped in Suspense
+- This enables streaming SSR for faster page loads
+
+Example pattern:
+import { Suspense } from 'react';
+import { SummaryCardsSkeleton } from '@/components/dashboard/SummaryCards';
+
+<Suspense fallback={<SummaryCardsSkeleton />}>
+  <SummaryCards userId={user.id} month={month} />
+</Suspense>
+
+TASK 2: Server Component Data Fetching
+Convert components to Server Components where possible:
+- Components that only display data (no onClick, useState)
+- Pass data as props to 'use client' chart components
+- Use parallel data fetching with Promise.all() in page.tsx
+
+TASK 3: Image & Asset Optimization
+- Add next/image for any user avatars or illustrations
+- Configure next.config.ts image domains
+- Add metadata with OG tags for all pages
+
+Create FILE: src/lib/utils/metadata.ts
+- generatePageMetadata(title, description): Metadata
+- Shared app name, OG image defaults
+
+TASK 4: Loading UI
+Create loading.tsx files for each dashboard page:
+Create FILE: src/app/(dashboard)/dashboard/loading.tsx
+Create FILE: src/app/(dashboard)/expenses/loading.tsx
+Create FILE: src/app/(dashboard)/analytics/loading.tsx
+Each: return full page skeleton using Shadcn Skeleton
+
+=== ERROR HANDLING ===
+
+TASK 5: Error Boundaries
+Create FILE: src/app/(dashboard)/dashboard/error.tsx
+Create FILE: src/app/(dashboard)/expenses/error.tsx
+'use client' error boundaries:
+- Show friendly error message
+- "Try again" button (calls reset())
+- "Go to Dashboard" link
+- Log to Sentry
+
+Create FILE: src/app/global-error.tsx
+'use client' global error boundary:
+- Catches errors in root layout
+- Minimal UI (no providers available)
+
+TASK 6: Not Found Pages
+Create FILE: src/app/not-found.tsx
+- Friendly 404 message
+- Simple SVG illustration
+- "Back to Dashboard" button
+- Consistent with app design
+
 === UI/UX POLISH ===
 
-TASK 1: Loading States
-Review ALL components and ensure:
-- Every data fetch has loading skeleton (not spinner only)
-- Buttons show loading state during async operations
-- Page transitions are smooth
-- No layout shifts during loading
+TASK 7: Responsive Design Audit
+Test and fix on all breakpoints:
+- Mobile: 375px (iPhone SE)
+- Tablet: 768px (iPad)
+- Desktop: 1280px, 1440px
 
-Create FILE: frontend/src/components/Common/PageLoader.jsx
-- Full-page loading animation for initial auth check
-- Smooth fade-out when loaded
+Fix any:
+- Table overflow on mobile (make scrollable)
+- Chart responsiveness (ResponsiveContainer)
+- Form layout on mobile (stack fields)
+- Sidebar on mobile (Sheet drawer)
 
-TASK 2: Error Boundary
-Create FILE: frontend/src/components/Common/ErrorBoundary.jsx
-- Catch React rendering errors
-- Display friendly error UI
-- "Try again" and "Go home" buttons
-- Log to Sentry
-- Wrap entire app and individual pages
-
-TASK 3: 404 Page
-Create FILE: frontend/src/pages/NotFoundPage.jsx
-- Friendly 404 message
-- Illustration
-- Go to Dashboard button
-- Search functionality (optional)
-
-TASK 4: Responsive Design Audit
-Review every page on:
-- Mobile (320px, 375px, 414px)
-- Tablet (768px, 1024px)
-- Desktop (1280px, 1440px)
-
-Fix any overflow, layout, or usability issues.
-
-TASK 5: Accessibility Audit
+TASK 8: Accessibility Audit
 Check and fix:
-- All images have alt text
-- Form inputs have labels
-- Buttons have descriptive text
+- All form inputs have associated labels
+- All Shadcn components have proper ARIA
 - Color contrast meets WCAG AA
-- Keyboard navigation works everywhere
+- Keyboard navigation works on all interactive elements
 - Focus indicators visible
-- Screen reader friendly (aria-labels)
+- Charts have aria-label descriptions
 
-TASK 6: Empty States
-Ensure ALL lists have proper empty states:
+TASK 9: Empty States Audit
+Ensure all lists have proper empty states:
 - Expenses: "No expenses found. Add your first expense!"
-- Income: "No income tracked. Add income to calculate savings"
-- Budget: "No budgets set. Create your first budget"
-- Analytics: "Not enough data yet. Keep tracking to see insights"
-
-=== PERFORMANCE OPTIMIZATION ===
-
-TASK 7: Frontend Optimization
-Run: cd frontend && npm run build
-Check bundle size and optimize:
-- Lazy load routes (React.lazy + Suspense for all pages)
-- Lazy load heavy components (Charts)
-- Optimize images
-- Ensure tree-shaking works
-- Add preconnect hints for API domain
-
-Update FILE: frontend/src/App.jsx
-- Use React.lazy for all pages
-- Add Suspense with loading fallback
-- Code split by route
-
-TASK 8: API Response Optimization
-Review all API endpoints:
-- Add select() to Prisma queries (only fetch needed fields)
-- Add proper pagination everywhere
-- Cache frequent queries (analytics summary)
-- Compress responses with compression middleware
-
-Update FILE: backend/src/server.js
-- Add compression middleware: npm install compression
-- Add response caching headers for static data
-
-TASK 9: Database Optimization
-Review and verify all indexes are in place:
-- Create missing indexes via Prisma migration
-- Verify N+1 query issues (use include carefully)
-- Add query analysis middleware in development
+- Income: "No income tracked yet. Add your first income source."
+- Budget: "No budgets created. Start tracking with a budget!"
+- Analytics: "Not enough data. Keep tracking to see insights."
 
 === DOCUMENTATION ===
 
 TASK 10: API Documentation
 Create FILE: docs/API.md
-Complete API reference with:
-For each endpoint:
-- Method + URL
-- Description
+For every API route, document:
+- Method + path
 - Auth required: Yes/No
-- Request params/body (with types)
-- Success response (with example)
+- Request body (TypeScript interface)
+- Query params (typed)
+- Success response (typed example)
 - Error responses
-- Example curl command
+- Example fetch call
 
 TASK 11: Architecture Documentation
 Create FILE: docs/ARCHITECTURE.md
-- System overview diagram (ASCII art)
-- Component architecture explanation
-- Database schema explanation
-- Authentication flow
-- Data flow diagrams
-- Third-party integrations
-- Security considerations
+- Next.js 14 App Router architecture diagram (ASCII)
+- Server Components vs Client Components decision tree
+- Drizzle ORM schema ERD (text)
+- NextAuth.js session flow
+- Data flow: Server Component → Client Component → TanStack Query
+- TypeScript type hierarchy
 
-TASK 12: Update README
+TASK 12: Final README Update
 Update FILE: README.md with:
-- Badges: Build Status, Coverage, License
-- Screenshot placeholder (add instructions)
+- Badges: Build, Coverage, TypeScript, License
 - Live demo link placeholder
-- Complete feature list with checkmarks
-- Clear installation instructions
-- Contributing guide
-- License section
+- Screenshots section
+- Complete new tech stack (Next.js 14)
+- Updated setup instructions
+- Development workflow
+- Testing guide (Vitest + Playwright)
 
-=== FINAL CHECKS ===
+=== LAUNCH PREPARATION ===
 
-TASK 13: Security Final Review
-Check:
-[ ] No API keys or secrets in code
-[ ] .env files in .gitignore
-[ ] All environment variables in .env.example
-[ ] Rate limiting on sensitive endpoints
-[ ] Input sanitization on all inputs
-[ ] SQL injection impossible (Prisma)
-[ ] XSS protection (Helmet)
-[ ] CORS properly configured for production domain
+TASK 13: Security Final Checklist
+Verify:
+[ ] NEXTAUTH_SECRET is 32+ random characters
+[ ] No .env files in git history
+[ ] All API routes use requireAuth()
+[ ] No passwordHash in any API response
+[ ] Zod validation on all route inputs
+[ ] Rate limiting on auth routes
+[ ] TypeScript: no any types, no @ts-ignore
+[ ] npm audit: no high/critical vulnerabilities
 
-TASK 14: Cross-Browser Testing
-Test in:
-- Chrome (latest)
-- Firefox (latest)
-- Safari (if possible)
-- Edge (latest)
+TASK 14: Performance Final Check
+Run Lighthouse on production URL:
+- Performance score > 80
+- Accessibility score > 90
+- Best Practices > 90
+- SEO > 80
 
-Fix any browser-specific issues.
+Check bundle analysis:
+- Run: ANALYZE=true npm run build
+- Identify and fix any oversized chunks
+- Verify code splitting by route is working
 
-TASK 15: Final Integration Test
-Manual test complete user journey:
+TASK 15: Complete User Journey Test
+Manual test everything:
 1. Register new account
 2. Login
-3. Add 10 expenses across different categories
+3. Add 10 expenses across 5 categories
 4. Add 2 income entries
-5. Create 3 budgets
-6. Check dashboard shows correct data
-7. View analytics with charts
+5. Create 3 budgets (one near limit)
+6. Check dashboard shows correct data and charts
+7. View analytics (all 4 tabs)
 8. Generate monthly report
-9. Export CSV
+9. Export CSV and PDF
 10. Change profile settings
-11. Change password
-12. View all pages on mobile
-13. Logout
-
-Fix any issues found.
+11. Test on mobile viewport
+12. Logout → verify redirect to /login
+13. Try to access /dashboard without auth → verify redirect
 
 TASK 16: Launch Checklist File
 Create FILE: LAUNCH_CHECKLIST.md
 Complete pre-launch verification:
 
 INFRASTRUCTURE:
-[ ] Backend deployed to Railway
-[ ] Frontend deployed to Vercel
-[ ] Database running in production
-[ ] Environment variables set
-[ ] Custom domain configured
-[ ] SSL certificate active
+[ ] Next.js app deployed to Vercel
+[ ] PostgreSQL database on Railway
+[ ] Environment variables set in Vercel
+[ ] Custom domain configured (optional)
+[ ] SSL certificate active (automatic on Vercel)
 
 FUNCTIONALITY:
-[ ] Registration + login works
-[ ] Expense CRUD works in production
-[ ] Charts load correctly
-[ ] Reports generate and download
-[ ] Email password reset works
-[ ] CSV import works
+[ ] Registration + login working in production
+[ ] Expense CRUD working
+[ ] Charts loading with real data
+[ ] Reports generating and downloading
+[ ] Password reset email working
+[ ] CSV import working
+[ ] Vercel cron jobs active
 
 MONITORING:
 [ ] Sentry capturing errors
-[ ] Health check returning 200
-[ ] Logs writing correctly
-[ ] Database backups configured
+[ ] Vercel Analytics active
+[ ] Health check: /api/health returns 200
+[ ] Logs visible in Vercel dashboard
 
 PERFORMANCE:
-[ ] Page load < 3 seconds
-[ ] API responses < 500ms
-[ ] Bundle size < 500KB gzipped
 [ ] Lighthouse score > 80
-
-SEO & SOCIAL:
-[ ] Meta tags set
-[ ] OG tags for social sharing
-[ ] favicon.ico present
+[ ] Page load < 3 seconds on 3G
+[ ] API responses < 500ms
+[ ] TypeScript: 0 errors
+[ ] No console errors in browser
 
 === FINAL VERIFICATION ===
 [ ] All 10 phases complete
-[ ] All tests passing
-[ ] Production deployment working
-[ ] Documentation complete
-[ ] Launch checklist verified
-[ ] Ready to share/showcase! 🚀
+[ ] npm run type-check: 0 errors
+[ ] npm test: all Vitest tests pass
+[ ] npm run test:e2e: Playwright tests pass
+[ ] npm run build: succeeds
+[ ] Production URL working
+[ ] Launch checklist completed
+[ ] Ready to ship! 🚀
+```
+
+---
+## ✅ PHASE 10 EXPECTED OUTPUT
+```
+Files Created: ~10 files
+Performance: Suspense streaming, optimized bundle
+Error handling: Error boundaries on all pages
+Loading UI: loading.tsx for each dashboard page
+Accessibility: WCAG AA compliant
+Documentation: Complete API docs + Architecture docs
+Launch: All checklists verified, production ready
 ```
 
 ---
@@ -2797,46 +2567,19 @@ SEO & SOCIAL:
 
 ## Files Created Per Phase
 
-| Phase | Files | Endpoints | Components |
-|-------|-------|-----------|------------|
-| Phase 1 | ~25 | 0 | 0 |
-| Phase 2 | ~20 | 6 | 4 |
-| Phase 3 | ~25 | 10 | 8 |
-| Phase 4 | ~30 | 15 | 12 |
-| Phase 5 | ~20 | 6 | 8 |
-| Phase 6 | ~15 | 5 | 6 |
-| Phase 7 | ~10 | 5 | 5 |
-| Phase 8 | ~20 | 0 | 0 |
-| Phase 9 | ~15 | 2 | 0 |
-| Phase 10 | ~10 | 0 | 5 |
-| **TOTAL** | **~190** | **~49** | **~48** |
-
----
-
-## Agent Usage Map
-
-```
-General Purpose Agent:
-  ├── Phase 1: Project initialization, structure
-  ├── Phase 8: Quality checks, code review
-  └── Phase 10: Final optimization, documentation
-
-Web Development Agent:
-  ├── Phase 2: Authentication (API + UI)
-  ├── Phase 3: Expenses (API + UI)
-  ├── Phase 4: Income + Budget (API + UI)
-  ├── Phase 7: Settings + Profile
-  ├── Phase 8: Testing
-  └── Phase 10: UI polish
-
-Data Analysis Agent:
-  ├── Phase 5: Analytics engine + insights
-  └── Phase 6: Reports + CSV generation
-
-DevOps Agent:
-  ├── Phase 1: Docker + environment setup
-  └── Phase 9: CI/CD + deployment
-```
+| Phase | Files | API Routes | Components | Tests |
+|-------|:-----:|:----------:|:----------:|:-----:|
+| Phase 1 | ~20 | 0 | 0 | 0 |
+| Phase 2 | ~15 | 6 | 4 | ✅ |
+| Phase 3 | ~20 | 8 | 8 | ✅ |
+| Phase 4 | ~25 | 12 | 12 | ✅ |
+| Phase 5 | ~18 | 5 | 8 | ✅ |
+| Phase 6 | ~12 | 4 | 6 | ✅ |
+| Phase 7 | ~10 | 4 | 5 | ✅ |
+| Phase 8 | ~20 | 0 | 0 | ✅ |
+| Phase 9 | ~12 | 1 | 0 | ✅ |
+| Phase 10 | ~10 | 0 | 5 | ✅ |
+| **TOTAL** | **~162** | **~40** | **~48** | **All** |
 
 ---
 
@@ -2845,27 +2588,47 @@ DevOps Agent:
 ```bash
 # Start development
 docker-compose up -d postgres
-cd backend && npm run dev
-cd frontend && npm run dev
+npm run dev
 
-# Execute a phase
-# In Claude Code, say: "Execute Phase X"
+# Database
+npm run db:push      # Apply schema changes
+npm run db:seed      # Seed default categories
+npm run db:studio    # Open Drizzle Studio (GUI)
+npm run db:generate  # Generate migration files
 
-# Run tests
-cd backend && npm test
-cd frontend && npm test
+# Testing
+npm test             # Vitest unit + integration
+npm run test:ui      # Vitest with browser UI
+npm run test:e2e     # Playwright E2E
+npm run test:coverage # Coverage report
 
-# Database operations
-cd backend && npm run db:migrate
-cd backend && npm run db:seed
-cd backend && npm run db:studio
+# Quality
+npm run type-check   # TypeScript strict check (must be 0 errors)
+npm run lint         # ESLint
+npm run format       # Prettier
 
-# Build for production
-cd frontend && npm run build
-cd backend && npm start
+# Build & Deploy
+npm run build        # Production build
+git push origin main # Triggers Vercel deployment via GitHub Actions
+```
 
-# Deploy
-git push origin main  # Triggers CD pipeline
+---
+
+## Key Architecture Decisions (New Stack)
+
+```
+OLD → NEW
+──────────────────────────────────────────────────────
+React 18 + Vite     →  Next.js 14 App Router
+Express.js backend  →  Next.js API Route Handlers
+Prisma ORM          →  Drizzle ORM (TypeScript-first)
+Custom JWT auth     →  NextAuth.js v5
+PropTypes           →  TypeScript interfaces
+express-validator   →  Zod schemas
+Jest                →  Vitest (faster, ESM native)
+Vite proxy          →  Same-origin API routes
+Separate deploys    →  Single Vercel deployment
+PostgreSQL:5432     →  PostgreSQL:5433
 ```
 
 ---
@@ -2874,21 +2637,22 @@ git push origin main  # Triggers CD pipeline
 
 > 💡 **Tip 1:** Complete each phase fully before starting the next.
 
-> 💡 **Tip 2:** After each phase, run the verification checklist by saying:
-> `"Run the Phase X verification checklist"`
+> 💡 **Tip 2:** After each phase run type-check:
+> `npm run type-check` must show **0 errors** before next phase.
 
 > 💡 **Tip 3:** If something fails, say:
-> `"Phase X task Y failed with error: [error message]. Fix it."`
+> `"Phase X Task Y failed with error: [error message]. Fix it."`
 
-> 💡 **Tip 4:** To check progress, say:
-> `"What is the current status of Phase X?"`
+> 💡 **Tip 4:** TypeScript errors blocking progress:
+> `"Fix all TypeScript errors in Phase X files"`
 
-> 💡 **Tip 5:** To skip optional tasks, say:
+> 💡 **Tip 5:** To skip optional tasks:
 > `"Execute Phase X but skip tasks Y and Z"`
 
-> 💡 **Tip 6:** To re-run a specific task, say:
-> `"Re-run Phase X Task Y"`
+> 💡 **Tip 6:** Server vs Client Component confusion:
+> `"Should [ComponentName] be a Server Component or Client Component and why?"`
 
 ---
 
-*Generated for SmartExpense Tracker Project | 10 Phases | ~190 Files | 20 Days*
+*Updated for Next.js 14 + Drizzle ORM + NextAuth.js v5 + TypeScript + Vitest*
+*SmartExpense Tracker | 10 Phases | ~162 Files | 20 Days*
