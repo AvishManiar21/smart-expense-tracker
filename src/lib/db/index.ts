@@ -1,12 +1,14 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
 
-// Load environment variables from .env.local for seed scripts and CLI tools
-if (!process.env.DATABASE_URL) {
-  dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+// For CLI tools and scripts, try to load .env.local if DATABASE_URL is not already set
+if (typeof window === 'undefined' && !process.env.DATABASE_URL) {
+  try {
+    require('dotenv').config({ path: '.env.local' });
+  } catch (e) {
+    // dotenv not available or error loading, continue with existing env
+  }
 }
 
 if (!process.env.DATABASE_URL) {
