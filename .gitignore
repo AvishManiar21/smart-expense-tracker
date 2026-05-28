@@ -52,3 +52,12 @@ tmp/
 
 # Claude Code
 .claude/
+
+# Next.js
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Drizzle
+drizzle/
